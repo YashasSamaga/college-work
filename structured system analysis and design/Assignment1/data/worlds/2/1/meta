@@ -1,0 +1,6 @@
+time 60
+initial_offset 0
+fill .
+drag 1
+next_world -1
+next_level -1
