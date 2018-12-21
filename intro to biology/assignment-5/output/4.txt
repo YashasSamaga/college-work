@@ -1,0 +1,9 @@
+Forward Primer - TTCAGGACTGAATCGTGCTCAC	Tm(in deg C) - 66
+Reverse Primer - AACGCATGAGAGGACAGTGCC	Tm(in deg C) - 66
+
+Forward Primer - ATTCAGGACTGAATCGTGCTCA	Tm(in deg C) - 64
+Reverse Primer - GACCCAACGCATGAGAGGACA	Tm(in deg C) - 66
+
+Forward Primer - AATTCAGGACTGAATCGTGCTCA	Tm(in deg C) - 66
+Reverse Primer - GACCCAACGCATGAGAGGAC	Tm(in deg C) - 64
+

@@ -1,0 +1,36 @@
+=== Generated schedule for mkTestBench ===
+
+Rule schedule
+-------------
+Rule: madd_add
+Predicate: madd_1
+Blocking rules: (none)
+ 
+Rule: _clk
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: _init
+Predicate: init
+Blocking rules: (none)
+ 
+Rule: _putValues
+Predicate: row .< 16'd10
+Blocking rules: (none)
+ 
+Rule: _print
+Predicate: row == 16'd10
+Blocking rules: (none)
+ 
+Rule: _checkAnswer
+Predicate: clk == 32'd120
+Blocking rules: (none)
+ 
+Logical execution order: _checkAnswer,
+			 _clk,
+			 _print,
+			 madd_add,
+			 _putValues,
+			 _init
+
+===========================================
