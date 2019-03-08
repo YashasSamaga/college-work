@@ -1,0 +1,36 @@
+Controls:
+W or SPACE: accelerate upwards
+S: accelerate downards (in addition to gravity)
+A or LEFT ARROW: accelerate leftwards
+D or RIGHT ARROW: accelerate rightwards
+F: fire a waterball
+MOUSE SCROLL UP: zoom in
+MOUSE SCROLL DOWN: zoom out
+Q or ESC: quit
+
+Displayed variables:
+- all numerical display appear on the top
+- [LEFT MOST ] score
+- [RIGHT MOST] lives (number of times you can take damage)
+- [MIDDLE    ] level
+
+Enemies:
+- take away a life when contacted
+  - boomerang
+  - fireline
+  - firebeam (moves vertically)
+  - iceballs
+  - dragon (moves vertically intelligently)
+- when player runs out of lives, the game quits and displays score
+
+Treasure Box:
+- provides a ton of coins
+
+Heart:
+- provides an extra LIFE
+
+Coins:
+- golden > silver > brown
+
+Notes:
+- on reaching 500 score, you are awarded a free shield
