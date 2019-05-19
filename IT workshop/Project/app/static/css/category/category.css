@@ -1,0 +1,30 @@
+.container {
+	padding: 3rem 10vw;
+	background-color: #f0f0f0;
+}
+
+.list-title {
+	 font-size: 2rem;
+}
+
+.tiles {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.tile {
+	margin: 1rem;
+}
+
+.pcover .icon {
+	 font-size: 15rem !important;
+}
+
+.rtitle {
+	font-size: 2rem;
+}
+
+.description {
+	font-size: 1rem;
+	margin: 0.5rem 0;
+}

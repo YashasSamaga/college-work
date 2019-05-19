@@ -1,0 +1,24 @@
+body {
+	background-image: url(http://api.thumbr.it/whitenoise-361x370.png?background=212121ff&noise=626262&density=77&opacity=81);
+}
+.http-error {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	margin: 3rem;
+}
+
+.http-error .title {
+	font-size: 5rem;
+	color: #ddd;
+}
+
+.http-error .ecode {
+	font-size: 4rem;
+	color: #ddd;
+}
+
+.http-error .emessage {
+	font-size: 3rem;
+	color: #ddd;
+}

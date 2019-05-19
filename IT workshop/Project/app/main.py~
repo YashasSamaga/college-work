@@ -1,0 +1,12 @@
+from flask import Flask, url_for, abort, redirect, render_template
+from config import *
+
+app = Flask(__name__)
+
+app.jinja_env.globals['WEBSITE_NAME'] = WEBSITE_NAME
+
+import routes
+
+if __name__ == '__main__':
+	app.debug = True
+	app.run()

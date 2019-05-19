@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% set title = "#1 Fundraiser" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/category/category.css')}}">
+{% endblock %}
+
+{% block content %}	
+<div class="container">
+	<p class="list-title">All Categories</p>
+		<div class="tiles container">
+		{% for category in categories %}
+			<div class="tile">
+				<div class="pcover"><i class="material-icons icon">{{ category.material_icon_id }}</i></div>
+				<div class="pinfo">
+					<div class="rtitle">{{ category.name }}</div>
+					<div class="description">{{ category.description }}</div>
+					<div class="project-link"><a href="{{ url_for('category_view', category = category.name) }}">Visit category page</a></div>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+	</div>
+</div>
+{% endblock %}

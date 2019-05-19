@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% set title = "Start a project" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/project/create.css')}}">
+{% endblock %}
+
+{% block content %}
+<form method="post" class="create-project">
+	{{ form.hidden_tag() }}
+	<div class="array">
+		<div>
+			<div class="title">Let's get your project steamed up</div>
+			<div class="title">It takes a minute to set up</div>
+		</div>
+	</div>
+	<div class="box">
+		<div>
+			<div class="note">Choose a name and category for your project</div>
+			<div class="subnote">Pro Tip: short titles and well-written titles attract attention</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+					{{ form.name(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.name.label(class_="form-element-label") }}
+				    {% for message in form.name.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+				<div class="form-element form-select">
+				    {{ form.category(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.category.label(class_="form-element-label") }}
+				    {% for message in form.category.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+		    	</div>
+		    </fieldset>
+		</div>
+		<div>
+			<div class="note">Write a short description about your project</div>
+			<div class="subnote">This is what donors see in the project cards!</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+					{{ form.description(class_="form-element-field form-textarea") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.description.label(class_="form-element-label") }}
+				    {% for message in form.description.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+			</fieldset>
+		</div>
+		<div>
+			<div class="note">Story of your project</div>
+			<div class="subnote">This provides detailed information about your project</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+					{{ form.story(id="tarea",class_="form-element-field form-textarea") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.story.label(class_="form-element-label") }}
+				    {% for message in form.story.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+			</fieldset>
+			<p>Preview</p>
+			<div id="preview" style="border: 1px #333 solid; padding: 10px; overflow: scroll; max-height: 800px; width: 100%;">
+			
+			</div>
+			<script>
+				function run() {
+					document.getElementById("preview").innerHTML = document.getElementById("tarea").value			
+				}
+				setInterval(run, 1000);
+			</script>
+		</div>
+		<div>
+			<div class="note">What topics does your project relate to?</div>
+			<div class="subnote">The tags help your project reach out to the correct audience</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+					{{ form.tags(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.tags.label(class_="form-element-label") }}
+				    {% for message in form.tags.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+			</fieldset>
+		</div>
+		<div>
+			<div class="note">Where's this happening?</div>
+			<div class="subnote">Is it happening in your town or on facebook? Or maybe ...?</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+					{{ form.location(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.location.label(class_="form-element-label") }}
+				    {% for message in form.location.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+			</fieldset>
+		</div>
+		<div>
+			<div class="note">How much funds do you plan to raise?</div>
+			<fieldset class="form-fieldset">
+				<div class="form-element">
+				    {{ form.target_fund(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.target_fund.label(class_="form-element-label") }}
+				    {% for message in form.target_fund.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+			   	</div>
+			</fieldset>
+		</div>	
+		<div class="form-actions">
+			{{ form.submit(class_="form-btn blue darken-4") }}
+		</div>	
+	</div>
+</form>	
+<script>
+document.addEventListener("change", function(event) {
+  let element = event.target;
+  if (element && element.matches(".form-element-field")) {
+    element.classList[element.value ? "add" : "remove"]("-hasvalue");
+  }
+});
+</script>
+{% endblock %}

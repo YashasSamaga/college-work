@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% set title = "Profile does not exist" %}
+{% if user != None %}
+{% set title = user.username + "'s Profile" %}
+{% endif %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/user/profile.css')}}">
+{% endblock %}
+
+{% block content %}
+<div class="profile">
+	<div class="container">
+		<div class="basic-info">
+		{% if user != None %}
+			<div class="avatar">
+				<img src="{{ url_for('static', filename=user['avatar']) }}"/>	
+			</div>
+		{% endif %}
+			<div>
+				{% if user != None %}
+					<div class="username">{{ user.username }}</div>
+					<div class="regdate">Member since {{ user.reg_date.isoformat().split("T")[0] }}</div>
+					{% if user.userid == session.get('userid', -1) %}
+					<div class="private-info">
+						<div class="balance">Your balance: {{ user.balance }} INR </div>
+					</div>
+					<form class="form-card" action="{{ url_for('user_add_balance') }}" method="post">
+						<div class="form-actions">
+							<input class="form-btn blue darken-4" type="submit" value="Add Balance">
+						</div>
+					</form>	
+					</div>
+					{% endif %}
+				{% else %}
+					<div class="username">No such account exists.</div>
+				{% endif %}
+			</div>
+			<div class = "donations">			
+			{% if donations and donations|length > 0 %}
+				<h2>Projects backed: </h2>
+				{% for donation in donations %}
+					<div>donated {{ donation.amount }} to <a href="{{ url_for('project_view', projectid = donation.projectid) }}"> {{ donation.project_name }}</a></div>
+				{% endfor %}
+			{% else %}
+				<h2>No projects backed yet.</h2>
+			{% endif %}
+			</div>
+			<div class = "donations">			
+			{% if favorites and favorites|length > 0 %}
+				<h2>Favorite projects: </h2>
+				{% for favorite in favorites %}
+					<a href="{{ url_for('project_view', projectid = favorite.projectid) }}"> {{ favorite.project_name }}</a></div>
+				{% endfor %}
+			{% else %}
+				<h2>No projects backed yet.</h2>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+</div>	
+{% endblock %}

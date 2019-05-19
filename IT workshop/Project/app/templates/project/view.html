@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% set title = "#1 Fundraiser" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/project/view.css')}}">
+{% endblock %}
+
+{% block content %}
+	{% if project == None %}
+	<div class="project-basic">
+		<div class="project-name">
+			<h1>No such project exists</h1>
+		</div>
+	</div>
+	{% else %}
+	<div class="cover">
+		<img class="cover-photo" src="{{ project.cover }}"/>
+	</div>
+	<div class="project-basic">
+		<div>
+			<div class="project-name">{{ project.name }}</div>
+			<div class="project-description">{{ project.description }}</div>
+			<div class="project-author">started by <a href="{{ url_for('user_profile', userid = project.userid) }}">{{ project.author }}</a></div>
+			{% if fav != None %}
+			<div class="project-author"><a href="{{ url_for('user_favorite', projectid = project.projectid) }}"><i class="material-icons">{{ micon }}</i></a></div>
+			{% endif %}
+		</div>
+		<div>
+			<div class="details">
+				<p>Created on: {{ project.start_date }} </p>
+				<p>Category: <a href="{{ url_for('category_view', category = project.category_name) }}">{{ project.category_name }} </a></p>
+				<p>Location: {{ project.location }} </p>
+				<p>Funding target: {{ project.target_fund }}$ </p>
+				<p>Current funding: {{ project.current_fund }}$ ({{ project.current_fund * 100.0//project.target_fund }}% funded) </p>
+			</div>
+		</div>
+		<div class="project-tags">
+			{% for tag in project.tags.split(',') %}
+				<span class="badge badge--info">{{ tag }}</span>
+			{% endfor %}
+		</div>
+	</div>
+	<div class="project-story">
+		<div>
+			<div class="story-title">The Story Behind</div>
+			<div class="story-text">
+				<p>{{ project.story.replace("\n", "<br>")|safe }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="donate">
+		<form method="post">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-fieldset">
+				<legend class="form-legend">{{ form.title }}</legend>
+				<div class="form-element">
+					{{ form.amount(class_="form-element-field") }}
+				    <div class="form-element-bar"></div>
+				    {{ form.amount.label(class_="form-element-label") }}
+				    {% for message in form.amount.errors %}
+					<div class="form-error">{{ message }}</div>
+					{% endfor %}
+				</div>
+			</fieldset>
+			<div class="form-actions">
+				{{ form.submit(class_="form-btn blue darken-4") }}
+			</div>
+		</form>
+	</div>
+	<hr>
+		{% if comments and comments|length > 0 %}
+		<div class="comments">
+			<h2>Comments</h2>
+			{% for comment in comments %}
+				<div class="comment">
+					<p>{{ comment.comment }}</p>
+					<p>by <a href="{{ url_for('user_profile', userid = project.userid) }}">{{ comment.uname }}</a></p>
+				</div>
+				<br>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% if 'userid' in session %}
+		<div class="add_comment">
+			<form action="{{ url_for('add_comment', projectid = project.projectid, userid = session['userid']) }}" method="post">
+				<fieldset class="form-fieldset">
+					<legend class="form-legend">{{ cform.title }}</legend>
+					<div class="form-element">
+						{{ cform.comment(class_="form-element-field") }}
+						<div class="form-element-bar"></div>
+						{{ cform.comment.label(class_="form-element-label") }}
+						{% for message in cform.comment.errors %}
+						<div class="form-error">{{ message }}</div>
+						{% endfor %}
+					</div>
+				</fieldset>
+				<div class="form-actions">
+					{{ cform.submit(class_="form-btn blue darken-4") }}
+				</div>
+			</form>
+		</div>
+		{% endif %}
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% set title = "Page Not Found" %}
+
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/error.css')}}">
+{% endblock %}
+
+{% block content %}
+<div class="http-error">
+	<div class="title">Oing! Oing!</div>
+	<div class="ecode">404</div>
+	<div class="emessage">Page not found</div>
+</div>
+{% endblock %}

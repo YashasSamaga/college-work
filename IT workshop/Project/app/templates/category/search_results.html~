@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% set title = "#1 Fundraiser" %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/category/search_results.css')}}">
+{% endblock %}
+
+{% block content %}
+{% if category == None %}
+<div class="category-header">
+	<div>
+		<div class="title">No such category exists</div>
+	</div>
+</div>
+{% else %}
+<div class="category-header">
+	<div class="title"><i class="material-icons icon">{{ category.material_icon_id }}</i> {{ category.name }}</div>
+	<div class="description">{{ category.description }}</div>
+</div>
+<div class="search">
+	<div class="title">Search for projects</div>
+	<form class="" action="{{ url_for('category_psearch', category = category.name) }}" method="get">
+		{{ form.hidden_tag() }}	
+		<fieldset class="form-fieldset">
+			 <div class="form-element form-input">
+		        {{ form.query(class_="form-element-field") }}
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label"><i class="material-icons icon">search</i></label>
+		        {% for message in form.query.errors %}
+				<div class="form-element-hint form-error">{{ message }}</div>
+				{% endfor %}
+		    </div>
+		</fieldset>	
+	</form>
+</div>
+<div class="search-results">	
+	{% if projects == None or projects|length == 0 %}
+		<p class="search-title">No results matched the query.</p>
+	{% else %}
+		<p class="search-title">Search results</p>
+		<div class="tiles container">
+		{% for project in projects %}
+			<div class="tile">
+				<div class="pcover"><img src="{{ project.cover }}"></img></div>
+				<div class="pinfo">
+					<div class="title">{{ project.name }}</div>
+					<div class="description">{{ project.description }}</div>
+					<div class="info">
+						<p>Current funding: {{ project.current_fund }}$ ({{ project.current_fund * 100.0//project.target_fund }}% funded) </p>
+						<span class="project-link"><a href="{{ url_for('project_view', projectid = project.projectid) }}">Visit project</a></span>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+	{% endif %}	
+</div>
+{% endif %}
+{% endblock %}

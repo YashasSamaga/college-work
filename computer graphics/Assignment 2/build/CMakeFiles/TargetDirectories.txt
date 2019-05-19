@@ -1,0 +1,3 @@
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/build/CMakeFiles/rebuild_cache.dir
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/build/CMakeFiles/graphics_asgn1.dir
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/build/CMakeFiles/edit_cache.dir

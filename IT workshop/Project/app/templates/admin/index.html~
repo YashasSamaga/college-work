@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% set title = "Add Category | Admin" %}
+
+{% block content %}
+<div class="admin">
+	<form class="form-card" action="{{ url }}" method="post">
+		{{ form.hidden_tag() }}
+		<fieldset class="form-fieldset">
+		    <legend class="form-legend">{{ form.title }}</legend>
+		    <div class="form-element">
+		    	{{ form.name(class_="form-element-field") }}
+		        <div class="form-element-bar"></div>
+		        {{ form.name.label(class_="form-element-label") }}
+		        {% for message in form.name.errors %}
+				<div class="form-error">{{ message }}</div>
+				{% endfor %}
+		    </div>
+		    <div class="form-element">
+		        {{ form.description(class_="form-element-field") }}
+		        <div class="form-element-bar"></div>
+		        {{ form.description.label(class_="form-element-label") }}
+		        {% for message in form.description.errors %}
+				<div class="form-error">{{ message }}</div>
+				{% endfor %}
+		    </div>
+		    <div class="form-element">
+		        {{ form.material_icon_id(class_="form-element-field") }}
+		        <div class="form-element-bar"></div>
+		        {{ form.material_icon_id.label(class_="form-element-label") }}
+		        {% for message in form.material_icon_id.errors %}
+				<div class="form-error">{{ message }}</div>
+				{% endfor %}
+		    </div>
+		    <div class="form-element">
+		        {{ form.default_project_cover(class_="form-element-field") }}
+		        <div class="form-element-bar"></div>
+		        {{ form.default_project_cover.label(class_="form-element-label") }}
+		        {% for message in form.default_project_cover.errors %}
+				<div class="form-error">{{ message }}</div>
+				{% endfor %}
+		    </div>			
+		</fieldset>
+		<div class="form-actions">
+			{{ form.submit(class_="form-btn blue darken-4") }}
+		</div>
+	</form>	
+</div>	
+{% endblock %}

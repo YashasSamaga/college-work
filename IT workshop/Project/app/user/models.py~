@@ -1,0 +1,74 @@
+from flask import session
+from datetime import datetime
+from werkzeug import generate_password_hash, check_password_hash
+
+import random
+
+from config import user_config
+from app import db
+
+class User(db.Model):
+	__tablename__ = "users"
+	
+	userid = db.Column(db.Integer, primary_key=True)
+	username = db.Column(db.String(100), unique=True, nullable=False)
+	email = db.Column(db.String(100), unique=True, nullable=False)
+	password_hash = db.Column(db.String(54), nullable=False)
+	reg_date = db.Column(db.DateTime, nullable=False)
+	avatar = db.Column(db.String(256), nullable=False)
+	balance = db.Column(db.Integer(), nullable=False)
+	confirmed = db.Column(db.Integer(), nullable = False)
+
+	def __init__(self, username, email, password):
+		self.username = username
+		self.email = email.lower()
+		self.set_password(password)
+		self.reg_date = datetime.now()
+		self.avatar = user_config["avatar_url"].format(random.randrange(0, 6))
+		self.balance = 0
+		self.confirmed = False
+
+	def set_password(self, password):
+		self.password_hash = generate_password_hash(password)
+		
+	def check_password(self, password):
+		return check_password_hash(self.password_hash, password)
+	
+	def serialize(self):
+		return { 'userid' : int(self.userid), 'username' : str(self.username), 'email' : str(self.email), 'reg_date' : str(self.reg_date.isoformat()), 'avatar' : str(self.avatar) }
+		
+	def __repr__(self):
+		return self.serialize().__repr__()
+		
+	@staticmethod
+	def check_account(name):
+		user = User.query.filter_by(email = name.lower()).first()
+		if user == None:
+			user = User.query.filter_by(username = name).first()		
+		return user
+		
+		
+class Donation(db.Model):
+	__tablename__ = "donations"		
+	
+	donationid = db.Column(db.Integer, primary_key = True)
+	userid = db.Column(db.Integer, db.ForeignKey('users.userid'))
+	projectid = db.Column(db.Integer, db.ForeignKey('projects.projectid'))
+	amount = db.Column(db.Integer)
+	
+	def __init__(self, userid, projectid, amount):
+		self.userid = userid
+		self.projectid = projectid
+		self.amount = amount
+		
+class Favorite(db.Model):
+	__tablename__ = "favorites"
+	
+	favid = db.Column(db.Integer, primary_key = True)
+	userid = db.Column(db.Integer, db.ForeignKey('users.userid'))
+	projectid = db.Column(db.Integer, db.ForeignKey('projects.projectid'))
+	
+	def __init__(self, userid, projectid, amount):
+		self.userid = userid
+		self.projectid = projectid
+		self.amount = amount

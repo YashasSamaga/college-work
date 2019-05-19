@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% set title = "Profile does not exist" %}
+{% if user != None %}
+{% set title = 'Profile activation' %}
+{% endif %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/user/activate.css')}}">
+{% endblock %}
+
+{% block content %}
+<div style="background-color: #fff; margin: 5rem; ">
+	<h2>Please activate your account to login.</h2>
+</div>
+{% endblock %}

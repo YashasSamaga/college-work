@@ -1,0 +1,5 @@
+1. `awk` checks if the length is more than 35, if it is, it dumps the output onto the pipeline. The `sed` command then replaces all occurences of the word "in" with "in fact".
+2. tries to replace "apathy" in the 3rd field with "empathy" using `sub` function of `awk`; if the word is not "apathy", the substitution will fail and hence no change is made.
+3. match any character and replace it with # from the 5th character onwards of each line
+4. sets field separator to ':'; the first field is now the username; the variable `count` keeps track of the number of users; the information is printed in the prescribed format using `printf`
+5. matches the statecode first; checks the delimiter used and indirectly stores it; match any two characters and then check if the delimiter is consistent; match any two characters and then check for "55" or "SS" (three consecutive 5s or Ss needn't be checked because this case will always satisfy the two consecutive 5s or Ss condition); checks the delimiter again and then tries to match either "O" or "0"

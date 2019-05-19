@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/login.css')}}">
+{% endblock %}
+
+{% block content %}
+<div id="signup" class="signup">
+	<form class="form-card" action="http://localhost:5000/register" method = "post">
+		<fieldset class="form-fieldset">
+		    <legend class="form-legend">Sign Up</legend>
+		    <div class="form-element form-input">
+		        <input id="field-name" class="form-element-field" placeholder="Enter your username" type="text" required/>
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label" for="field-name">Username</label>
+		    </div>
+		    <div class="form-element form-input">
+		        <input id="field-name" class="form-element-field" placeholder="Enter your email" type="email" required/>
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label" for="field-name">Email</label>
+		    </div>
+		    <div class="form-element form-input">
+		        <input id="field-password" class="form-element-field" placeholder="Enter your" type="password" required/>
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label" for="field-password">Password</label>
+		    </div>
+		    <div class="form-element form-input">
+		        <input id="field-password" class="form-element-field" placeholder="Enter your" type="password" required/>
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label" for="field-password">Re-type Password</label>
+		    </div>
+		    <div class="form-element">
+		    	<label class="">FundMePlease's fee is 1% from each donation you receive in addtition to the payment gateway charges. By continuing, you agree with the FundMePlease's fees, terms and privacy policy.</label>
+			</div>
+		</fieldset>
+		<div class="form-actions">			
+			<button class="form-btn blue darken-4" type="submit">Sign Up</button>
+		</div>
+	</form>	
+</div>	
+{% endblock %}

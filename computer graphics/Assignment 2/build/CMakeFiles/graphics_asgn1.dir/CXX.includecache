@@ -1,0 +1,396 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/ball.cpp
+ball.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/ball.h
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/ball.h
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/colors.hpp
+cstdint
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/input.cpp
+iostream
+-
+cmath
+-
+fstream
+-
+vector
+-
+GL/glew.h
+-
+GLFW/glfw3.h
+-
+glm/glm.hpp
+-
+glm/gtx/transform.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+utils.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/utils.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/level.cpp
+vector
+-
+memory
+-
+algorithm
+-
+random
+-
+iostream
+-
+models/player.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/player.hpp
+models/digit.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/digit.hpp
+models/sea.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/sea.hpp
+models/meter.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/meter.hpp
+models/arrow.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/arrow.hpp
+models/carrier.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/carrier.hpp
+models/destroyer.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyer.hpp
+models/destroyerE.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyerE.hpp
+models/island.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/island.hpp
+models/volcano.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/volcano.hpp
+models/gasoline.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/gasoline.hpp
+models/ring.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/ring.hpp
+models/missile.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/missile.hpp
+models/bomb.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/bomb.hpp
+models/cannon.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/cannon.hpp
+models/parachute.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/parachute.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/level.hpp
+GLFW/glfw3.h
+-
+glm/glm.hpp
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.cpp
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+level.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/level.hpp
+colors.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/colors.hpp
+vector
+-
+memory
+-
+chrono
+-
+thread
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+cmath
+-
+fstream
+-
+GL/glew.h
+-
+GLFW/glfw3.h
+-
+glm/glm.hpp
+-
+glm/gtx/transform.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+colors.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/colors.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/arrow.cpp
+arrow.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/arrow.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/arrow.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+vector
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/bomb.cpp
+bomb.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/bomb.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/bomb.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/cannon.cpp
+cannon.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/cannon.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/cannon.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/carrier.cpp
+carrier.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/carrier.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/carrier.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyer.cpp
+destroyer.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyer.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyer.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyerE.cpp
+destroyerE.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyerE.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/destroyerE.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/digit.cpp
+digit.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/digit.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/digit.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+vector
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/gasoline.cpp
+gasoline.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/gasoline.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+iostream
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/gasoline.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/island.cpp
+island.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/island.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/island.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/meter.cpp
+meter.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/meter.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/meter.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+vector
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/missile.cpp
+missile.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/missile.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/missile.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+GL/glew.h
+-
+glm/glm.hpp
+-
+../utils.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/utils.hpp
+../main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/parachute.cpp
+parachute.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/parachute.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/parachute.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+vector
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/player.cpp
+iostream
+-
+player.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/player.hpp
+../colors.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/colors.hpp
+../utils.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/utils.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/player.hpp
+../main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+glm/glm.hpp
+-
+vector
+-
+memory
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/ring.cpp
+ring.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/ring.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/ring.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/sea.cpp
+sea.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/sea.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/sea.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/volcano.cpp
+volcano.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/volcano.hpp
+../tools/objloader.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/volcano.hpp
+model.hpp
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/models/model.hpp
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/nonedit.cpp
+iostream
+-
+cmath
+-
+fstream
+-
+vector
+-
+GL/glew.h
+-
+GLFW/glfw3.h
+-
+glm/glm.hpp
+-
+glm/gtx/transform.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/other_handlers.cpp
+iostream
+-
+cmath
+-
+fstream
+-
+vector
+-
+GL/glew.h
+-
+GLFW/glfw3.h
+-
+glm/glm.hpp
+-
+glm/gtx/transform.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+main.h
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/main.h
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.cpp
+iostream
+-
+cstring
+-
+fstream
+-
+vector
+-
+algorithm
+-
+iterator
+-
+array
+-
+GL/gl.h
+-
+glm/glm.hpp
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/tools/objloader.hpp
+vector
+-
+GL/gl.h
+-
+glm/glm.hpp
+-
+
+/home/yashas/Desktop/EvaluationGraphics/a2_20171080/Assignment 2/src/utils.hpp
+algorithm
+-
+cmath
+-
+

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/login.css')}}">
+{% endblock %}
+
+
+{% block content %}
+<div id="login" class="login">
+	<form class="form-card">
+		<fieldset class="form-fieldset">
+		    <legend class="form-legend">Login</legend>
+		    <div class="form-element">
+		    	<label class="form-element-label">Username/Email</label>
+		        <input class="form-element-field" placeholder="Enter your username/email" type="text" required/>
+		        <div class="form-element-bar"></div>
+		        
+		    </div>
+		    <div class="form-element">
+		        <input class="form-element-field" placeholder="Enter your" type="password" required/>
+		        <div class="form-element-bar"></div>
+		        <label class="form-element-label">Password</label>
+		    </div>
+		    <div class="form-checkbox">
+		        <label class="form-checkbox-label">
+		            <input class="form-checkbox-field" type="checkbox" />
+		            <i class="form-checkbox-button"></i>
+		            <span>Remember Me</span>
+		        </label>
+		    </div>			
+		</fieldset>
+		<div class="form-actions">
+			<button class="form-btn blue darken-4" type="submit">Login</button>
+		</div>
+	</form>	
+</div>	
+{% endblock %}

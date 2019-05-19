@@ -1,0 +1,63 @@
+.intro {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	background-color: #fff;
+	padding: 4rem 10rem;
+}
+
+.intro .msg {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	font-size: 1.5rem;
+	font-family: "Gugi";
+}
+
+.intro i {
+	font-size: 25rem;
+}
+
+.box, .array {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+}
+.box > div {
+	min-width: 40vw;
+	max-width: 80vw;
+}
+
+.array > div {
+	min-width: 40vw;
+	max-width: 80vw;
+}
+
+.box {
+	background-color: #f0f0f0;	
+}
+
+.array {
+	background-color: #ddd;	
+}
+
+.box .title, .array .title {
+	color: #333;
+	font-size: 3rem;
+	font-weight: 100;
+	text-align: center;
+}
+.box .note {
+	color: #111;
+	font-size: 2rem;
+	text-align: center;
+	margin: 2rem 1rem;
+}
+
+.box .subnote {
+	color: #333;
+	font-size: 1rem;
+	text-align: center;
+	margin: 1rem;
+}

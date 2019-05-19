@@ -1,0 +1,39 @@
+from flask_wtf import Form
+from wtforms import TextField, PasswordField, SubmitField, ValidationError, TextAreaField, SelectField
+from wtforms.validators import *
+from wtforms.fields.html5 import IntegerField
+
+from app.common.forms import InlineSubmitField
+from app.category.models import Category
+from app.project.models import Project
+
+class CreateProjectForm(Form):
+	title = "Start a project"
+	name = TextField("Project Title *",  [Required()], render_kw = { "placeholder" : "Enter project name", "required" : "required" })
+	category = SelectField("Choose a category *", [Required()], coerce = int)
+	description = TextAreaField("Project Description *", render_kw = { "placeholder" : "Enter project description", "required" : "required"})
+	story = TextAreaField("Project Story *", render_kw = { "placeholder" : "Enter your story", "required" : "required"})
+	location = TextField("Location *",  [Required()], render_kw = { "placeholder" : "Where's this happening?", "required" : "required" })
+	tags = TextField("Tags (comma separated)", render_kw = { "placeholder" : "Enter the tags separated by comma"})
+	
+	target_fund = IntegerField("Target Fund (in $) *", render_kw = { "placeholder" : "100$" });
+	submit = InlineSubmitField("Start my project")
+	
+	def __init__(self, *args, **kwargs):
+		Form.__init__(self, *args, **kwargs)
+		
+class FundForm(Form):
+	title = "We need your help"	
+	amount = IntegerField("Donation amount: ", [Required(), NumberRange(min = 10, message = "We require a minimum of 10$ per donation.")], render_kw = { "placeholder" : "100$" });
+	submit = InlineSubmitField("Back this project")
+	
+	def __init__(self, *args, **kwargs):
+		Form.__init__(self, *args, **kwargs)
+		
+class CommentForm(Form):
+	title = "Make a comment"	
+	comment = TextField("Comment *",  [Required()], render_kw = { "placeholder" : "Enter your comment", "required" : "required" })
+	submit = InlineSubmitField("Comment")
+	
+	def __init__(self, *args, **kwargs):
+		Form.__init__(self, *args, **kwargs)

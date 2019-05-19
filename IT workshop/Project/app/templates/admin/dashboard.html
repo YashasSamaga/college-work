@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% set title = "Add Category | Admin" %}
+
+{% block content %}
+<div style="padding: 5rem; background-color: #fff;">
+	<h2>Administrator Dashboard</h2>
+	<ul>
+		<li><a href="{{ url_for('admin_addcategory') }}">Add new category</a></li>
+	</ul>	
+</div>	
+{% endblock %}

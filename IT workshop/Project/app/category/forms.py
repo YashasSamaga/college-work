@@ -1,0 +1,13 @@
+from flask_wtf import Form
+from wtforms import TextField, ValidationError
+from wtforms.validators import *
+
+from app.common.forms import InlineSubmitField
+
+class CProjectSearch(Form):
+	title = "Login"
+	query = TextField("Search",  [Required()], render_kw = { "placeholder" : "Enter your search string (prefixes = tag:, project:)", "required" : "required" })
+	submit = InlineSubmitField("Search")
+	
+	def __init__(self, *args, **kwargs):
+		Form.__init__(self, *args, **kwargs)

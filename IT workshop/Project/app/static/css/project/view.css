@@ -1,0 +1,122 @@
+.cover {
+	margin-top: 1rem;
+	border-top: 3px #111 solid;
+	border-bottom: 3px #111 solid;
+	overflow: hidden;
+	height: 40vh;
+}
+
+.cover .cover-photo {
+	width: 100%;	
+}
+
+.project-basic {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	background-color: #f0f0f0;
+}
+
+.project-basic > div {
+	min-width: 50vw;
+	max-width: 80vw;
+}
+
+.project-basic .project-name {
+	color: #333;
+	font-size: 3rem;
+	text-align: center;
+	margin: 0.5rem 0;
+}
+
+.project-basic .project-description {
+	color: #333;
+	font-size: 1.6rem;
+	font-weight: 100;
+	text-align: center;
+	margin: 0.5rem 0;
+}
+
+.project-basic .project-author {
+	color: #333;
+	font-size: 1.3rem;
+	text-align: center;
+	margin: 0.5rem 0;
+}
+
+.project-basic .details p {
+	color: #333;
+	font-size: 1rem;
+}
+
+.project-basic .project-tags {
+	margin: 2rem 0;
+}
+
+.project-story {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem 1rem;
+	background-color: #f0f0f0;
+}
+
+.project-story > div {
+	min-width: 50vw;
+	max-width: 80vw;
+}
+
+.project-story .story-title {
+	color: #333;
+	font-size: 2.2rem;
+	margin: 1rem 0;
+}
+
+.project-story .story-text {
+	color: #333;
+	font-size: 1.3rem;
+	font-weight: 500;
+	text-align: justify;
+}
+
+.donate {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	background-color: #f0f0f0;
+}
+
+.donate form {
+	min-width:480px;
+}
+
+.add_comment {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	background-color: #f0f0f0;
+}
+
+.add_comment form {
+	min-width:480px;
+}
+
+.comments {
+	padding: 3rem 10vw;
+	background-color: #f0f0f0;
+}
+.comment {
+	margin-left: 3rem;
+	line-height: 10px;
+}
+
+.comments form {
+	min-width:480px;
+}
