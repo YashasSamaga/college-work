@@ -1,0 +1,3 @@
+[submodule "distributed systems/MapReduce"]
+	path = distributed systems/MapReduce
+	url = https://github.com/TheCharmingSociopath/MapReduce.git
