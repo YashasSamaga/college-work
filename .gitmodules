@@ -1,3 +1,6 @@
 [submodule "distributed systems/MapReduce"]
 	path = distributed systems/MapReduce
 	url = https://github.com/TheCharmingSociopath/MapReduce.git
+[submodule "distributed systems/assignment 3/rpclib"]
+	path = distributed systems/assignment 3/rpclib
+	url = https://github.com/rpclib/rpclib.git
