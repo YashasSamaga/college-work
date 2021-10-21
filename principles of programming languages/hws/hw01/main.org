@@ -1,0 +1,705 @@
+#+NAME: Homework Assignment 01 : Solution
+
+* Introduction
+
+  This is the solution to homework assigment 1. Pre-conditions for some solutions have been listed explicitly but are not taken care by the function. These should ideally be handled through contracts.
+  
+* Reccursion on Lists
+
+** Problem No. 1.1: Repeat
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    The basic idea is `(append (list x) (repeat (sub1 n) x))`. We keep adding an element until the `n` argument becomes zero.
+
+**** Step 2: handle base cases
+    - `n` is zero: return `null`
+    - `n` is one: return `(list x)`
+
+**** Final code
+    Pre-conditions:
+    - `n` must be non-negative
+
+#+NAME: repeat
+#+BEGIN_SRC scheme
+  (define (repeat n x)
+      (cond
+          [(equal? n 0) (list)]
+          [(equal? n 1) (list x)]
+          [else (append (list x) (repeat (sub1 n) x))]
+      )
+  )
+#+END_SRC
+
+** Problem No. 1.2: Invert
+
+  We can break the problem into two subproblems: reverse and map. We execute reverse on each element of the list using map.
+
+*** Solution
+
+**** Step 1: my-reverse
+
+Reverse is almost identical to copying a list. We just append the remaining reversed list first and then the current item. We continue recursing until we arrive at an empty list whose reverse is the empty list itself.
+
+#+NAME: repeat-s1-reverse
+#+BEGIN_SRC scheme
+    (define (my-reverse lst)
+        (cond
+            [(null? lst) empty]
+            [else (append (my-reverse (cdr lst)) (list (car lst)))]
+        )
+    )
+#+END_SRC
+
+**** Step 2: my-map
+
+We construct the modified list one by one. At each recursion step, we compute the transformed value and `(cons transformed-value (my-map f remaining-list))`.
+
+#+NAME: repeat-s2-map
+#+BEGIN_SRC scheme
+    (define (my-map f lst)
+        (cond
+            [(null? lst) empty]
+            [else (cons (f (car lst)) (my-map f (cdr lst)))]
+        )
+    )
+#+END_SRC
+
+**** Final code
+    Pre-conditions:
+    - `lst` must be a 2-list
+
+#+NAME: invert
+#+BEGIN_SRC scheme
+  (define (invert lst)
+      (define (my-reverse lst)
+          (cond
+              [(null? lst) empty]
+              [else (append (my-reverse (cdr lst)) (list (car lst)))]
+          )
+      )
+      (define (my-map f lst)
+          (cond
+              [(null? lst) empty]
+              [else (cons (f (car lst)) (my-map f (cdr lst)))]
+          )
+      )
+      (my-map my-reverse lst)
+  )
+#+END_SRC
+
+** Problem No. 1.3: Count Occurences
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is:
+    ```
+    if x is (car lst):
+       return (add1 (count-occurrences x (cdr lst))
+    else
+       return (count-occurrences x (cdr lst))
+    ```
+
+**** Step 2: handle base cases
+    - `lst` is empty; return zero.
+
+**** Final code
+    Pre-conditions:
+    - `lst` must be a list
+
+#+NAME: count-occurrences
+#+BEGIN_SRC scheme
+  (define (count-occurrences s lst)
+      (cond
+          [(null? lst) 0]
+          [(equal? s (car lst)) (+ 1 (count-occurrences s (cdr lst)))]
+          [else (count-occurrences s (cdr lst))]
+      )
+  )
+#+END_SRC
+
+** Problem No. 1.4: Product
+
+*** Solution
+
+**** Step 1: `(product1 x lst)`
+    This helper function generates a 2-list consisting of `(x y)` elements for every element `y` in `lst`.
+
+    ```
+    (product1 5 '(1 2 3)) => '((5 1) (5 2) (5 3))
+    ```
+
+**** Step 2: `(product2 lst1 lst2)`
+    This helper function takes two non-empty lists and computes the cartesian product of the two. This is achieved by appending results of `(product1 x lst2)` for each element `x` of `lst1`.
+
+**** Step 3: edge cases
+    - return empty list if both input lists are empty
+    - return `lst2` if `lst1` is empty
+    - return `lst1` if `lst2` is empty
+
+**** Final code
+    Pre-conditions:
+    - `lst1` and `lst2` mut be lists
+
+#+NAME: product
+#+BEGIN_SRC scheme
+(define (product lst1 lst2)
+    (define (product1 x lst)
+        (cond
+            [(null? lst) null]
+            [else (append (list (list x (car lst))) (product1 x (cdr lst)))]
+        )
+    )
+    (define (product2 lst1 lst2)
+        (cond
+            [(null? lst1) null]
+            [(append (product1 (car lst1) lst2) (product2 (cdr lst1) lst2))]
+        )
+    )
+    (cond
+        [(and (null? lst1) (null? lst2)) (list)] ;; redundant but let's keep it for clarity
+        [(null? lst1) lst2]
+        [(null? lst2) lst1]
+        [else (product2 lst1 lst2)]
+    )
+)
+#+END_SRC
+
+** Problem No. 1.5: Every
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is `(and (f (car lst)) (every f (cdr lst)))`. We keep checking one element at a time.
+    .
+**** Step 2: handle base cases
+    - `lst` is empty, return `#t`
+
+**** Final code
+    Pre-conditions:
+    - `lst` must be a list
+    - `f` must be a unary predicate
+
+#+NAME: every
+#+BEGIN_SRC scheme
+(define (every f lst) ;; andmap
+    (cond
+        [(null? lst) #t]
+        [else (and (f (car lst)) (every f (cdr lst)))]
+    )
+)
+#+END_SRC
+
+** Problem No. 1.6: Merge
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is:
+    ```
+    if (car lst1) < (car lst2):
+        (append (car lst1) (merge (cdr lst1) lst2))
+    else:
+        (append (car lst2) (merge lst1 (cdr lst1)))
+    ```
+
+**** Step 2: handle base cases
+    - `lst1` is empty, return `lst2`
+    - `lst2` is empty, return `lst2`
+    - `lst1` and `lst2` are empty, return null list
+
+**** Final code
+    Pre-conditions:
+    - `lst1` must be a list sorted in ascending order
+    - `lst2` must be a list sorted in ascending order
+    - list items should be comparable using `<=`
+
+#+NAME: merge
+#+BEGIN_SRC scheme
+  (define (merge lst1 lst2)
+      (cond
+          [(and (null? lst1) (null? lst2)) null] ;; retundant but let's keep it for clarity
+          [(null? lst1) lst2]
+          [(null? lst2) lst1]
+          [(<= (car lst1) (car lst2)) (append (list (car lst1)) (merge (cdr lst1) lst2))]
+          [else (merge lst2 lst1)]
+      )
+  )
+#+END_SRC
+
+** Problem No. 1.7: Flatten
+
+*** Solution
+
+**** Step 1: identify iterative logic
+    ```
+    current_list = '()
+    for x in lst:
+        if x is a list:
+           (append current_list (flatten x))
+        else:
+           (append current_list (list x))
+    ```
+
+**** Step 2: convert iterative logic to recusrion logic
+    ```
+    if (car lst) is list:
+       (append (flatten (car lst)) (flatten (cdr lst)))
+    else
+       (append (list (car lst)) (flatten (cdr lst)))
+    ```
+
+**** Step 3: handle base cases
+    - `lst` is empty, return empty list
+
+**** Final code
+    Pre-conditions:
+    - `lst` must be list
+
+#+NAME: flatten
+#+BEGIN_SRC scheme
+  (define (flatten lst)
+      (if (null? lst)
+          null
+          (let
+              ([x (car lst)] [r (cdr lst)])
+              (cond
+                  [(list? x) (append (flatten x) (flatten r))]
+                  [else (append (list x) (flatten r))]
+              )
+          )
+      )
+  )
+#+END_SRC
+
+* Reccursion on Trees
+
+
+** Problem No. 2.1 : Preorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: current, left, right
+
+    ```
+    if current_node is internal:
+        (append (list v) (traverse/preorder l) (traverse/preorder r))
+    else:
+        (list v)
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: traverse/preorder
+#+BEGIN_SRC scheme
+(define (traverse/preorder tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (append (list v) (traverse/preorder l) (traverse/preorder r)))
+    (leaf-node (v) (list v))
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.2 : Inorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: left, current, right
+
+    ```
+    if current_node is internal:
+        (append (traverse/inorder l) (list v) (traverse/inorder r))
+    else:
+        (list v)
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: traverse/inorder
+#+BEGIN_SRC scheme
+(define (traverse/inorder tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (append (traverse/inorder l) (list v) (traverse/inorder r)))
+    (leaf-node (v) (list v))
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.3 : Postorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: left, right, current
+
+    ```
+    if current_node is internal:
+        (append (traverse/postorder l) (traverse/postorder r) (list v))
+    else:
+        (list v)
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: traverse/postorder
+#+BEGIN_SRC scheme
+(define (traverse/postorder tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (append (traverse/postorder l) (traverse/postorder r) (list v)))
+    (leaf-node (v) (list v))
+  )
+)
+#+END_SRC
+
+** Problem No. 2.4 : Count All Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    ```
+    if current_node is internal:
+        (+ (count-nodes l) 1 (count-nodes r))
+    else:
+        1
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count-nodes
+#+BEGIN_SRC scheme
+(define (count-nodes tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (+ (count-nodes l) 1 (count-nodes r)))
+    (leaf-node (v) 1)
+  )
+)
+#+END_SRC
+
+** Problem No. 2.5 : Count Leaf Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    ```
+    if current_node is internal:
+        (+ (count-leaves l) 0 (count-leaves r))
+    else:
+        1
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count-leaves
+#+BEGIN_SRC scheme
+(define (count-leaves tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (+ (count-leaves l) 0 (count-leaves r)))
+    (leaf-node (v) 1)
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.6 : Count Internal Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    ```
+    if current_node is internal:
+        (+ (count-internal l) 1 (count-internal r))
+    else:
+        0
+    ```
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count-internal
+#+BEGIN_SRC scheme
+(define (count-internal tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (+ (count-internal l) 1 (count-internal r)))
+    (leaf-node (v) 0)
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.7 : Map
+
+*** Solution
+
+**** Step 1: identify logic
+    We essentially need to reconstruct the tree with new values for the nodes. We first write a function that will recreate the tree one node at a time. We then modify the code to use `(f v)` instead of `v` while duplicating a node.
+
+**** Final code
+    Pre-conditions:
+    - `f` must be unary function
+
+#+NAME: tree/map
+#+BEGIN_SRC scheme
+(define (tree/map f tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r) (inode (f v) (tree/map f l) (tree/map f r)))
+    (leaf-node (v) (lnode (f v)))
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.8 : Value at path
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    ```
+    if path is empty:
+        node value
+    elif (car path) == "left":
+        (value-at-path (cdr path) left-subtree)
+    elif (car path) == "right":
+        (value-at-path (cdr path) right-subtree)
+    ```
+
+**** Step 2: handle base cases
+    - leaf node: return value if path is empty, otherwise raise an error
+    - raise exception if something other than `"left"` or `"right"` is found
+
+**** Final code
+    Pre-conditions:
+    - `path` must be list consisting of "left" and "right" only
+
+#+NAME: value-at-path
+#+BEGIN_SRC scheme
+(define (value-at-path path tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r)
+      (cond
+        [(null? path) v]
+        [(equal? (car path) "left") (value-at-path (cdr path) l)]
+        [(equal? (car path) "right") (value-at-path (cdr path) r)]
+        [else (raise "invalid path item")]
+      )
+    )
+    (leaf-node (v)
+      (cond
+        [(null? path) v]
+        [else (raise "invalid path (seeks subtree at leaf node)")]
+      )
+    )
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.9 : Search
+
+*** Solution
+
+**** Step 1: the main idea
+    We will go searching for the value and reconstruct the path as we return from the found site. We return #f if the path is not found.
+
+    Preorder: current, left, right
+
+    ```
+    if current_node->value == key:
+        (list) ;; empty path
+    elif (search key left-subtree) is not #f:
+        (append (list "left") (search key left-subtree)) ;; not #f => we found the value! we append "left" to the search path
+    elif (search key right-subtree) is not #f:
+        (append (list "right") (search key right-subtree)) ;; not #f => we found the value! we append "right" to the search path
+    else:
+        #f ;; not found
+    
+    ```
+
+**** Step 2: handle base cases
+    - leaf-node, return `'()` if the node's value matches the key, otherwise return #f
+
+**** Final code
+
+#+NAME: search
+#+BEGIN_SRC scheme
+(define (search key tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r)
+      (if (equal? v key)
+        '()
+        (cond
+          [(list? (search key l)) (append (list "left") (search key l))]
+          [(list? (search key r)) (append (list "right") (search key r))]
+          [else #f]
+        )
+      )
+    )
+    (leaf-node (v)
+      (cond
+        [(equal? v key) '()]
+        [else #f]
+      )
+    )
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.10 : Update
+
+*** Solution
+
+**** Step 1: the main idea
+    ```
+    if path is empty:
+        if node is internal:
+            (inode (f value) left-subtree right-subtree) ;; we don't have to traverse the left and right subtrees
+        else:
+            (lnode (f value))
+    elif (car path) == "left":
+       ;; must be internal node
+       (inode value (update (cdr path) left-subtree) f right-subtree)
+    elif (car path) == "right":
+       ;; must be internal node
+       (inode value left-subtree (update (cdr path) f right-subtree) left-subtree)
+    ```
+
+**** Step 2: handle edge case
+    - path not empty at leaf node, return node unmodified
+    - path has something other than "left" or "right", return node unmodified
+
+**** Final code
+    Pre-conditions:
+    - `f` must be a unary function
+    - `path` must be a list consisting of `"left"` and `"right"`
+
+#+NAME: update
+#+BEGIN_SRC scheme
+(define (update path f tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r)
+      (cond
+        [(null? path) (inode (f v) l r)]
+        [(equal? (car path) "left") (inode v (update (cdr path) f l) r)]
+        [(equal? (car path) "right") (inode v l (update (cdr path) f r))]
+        [else (inode v l r)] ;; return unmodified tree for invalid path
+      )
+    )
+    (leaf-node (v)
+      (cond
+        [(null? path) (lnode (f v))]
+        [else (lnode v)] ;; return unmodified tree for invalid path
+      )
+    )
+  )
+)
+#+END_SRC
+
+
+** Problem No. 2.11 : Insert
+
+*** Solution
+
+**** Step 1: identify iterative logic
+    We only insert at leaf nodes. We have to reconstruct rest of the tree. We copy-paste the update code and replace the `update` recursive call with `tree/insert`. Our only change is how we handle the case where the path leads to an internal node or how we handle leaf nodes.
+
+**** Step 2: handle leaf node
+    - if path is empty, create a new internal node with the given subtrees
+    - if the path is not empty, return the leaf node as it is
+
+**** Step 3: handle edge case
+    - if the path ends at an internal node, return the internal node as it is
+
+**** Final code
+    Pre-conditions:
+    - `left-st` must be a full binary tree
+    - `right-st` must be a full binary tree
+    - `path` must be a list consisting of `"left"` and `"right"`
+
+#+NAME: tree/insert
+#+BEGIN_SRC scheme
+(define (tree/insert path left-st right-st tree)
+  (cases full-binary-tree tree
+    (internal-node (v l r)
+      (cond
+        [(null? path) (inode v l r)] ;; return unmodified for invalid path
+        [(equal? (car path) "left") (inode v (tree/insert (cdr path) left-st right-st l) r)]
+        [(equal? (car path) "right") (inode v l (tree/insert (cdr path) left-st right-st r))]
+        [else (inode v l r)]
+      )
+    )
+    (leaf-node (v)
+      (cond
+        [(null? path) (inode v left-st right-st)]
+        [else (lnode v)] ;; return unmodified tree for invalid path
+      )
+    )
+  )
+)
+#+END_SRC
+
+* Tangle
+
+#+BEGIN_SRC scheme :noweb yes :tangle ./main.rkt
+#lang racket/base
+
+(require eopl)
+(require "datatypes.rkt")
+
+<<repeat>>
+<<invert>>
+<<count-occurrences>>
+<<product>>
+<<every>>
+<<merge>>
+<<flatten>>
+
+<<traverse/preorder>>
+<<traverse/inorder>>
+<<traverse/postorder>>
+<<count-nodes>>
+<<count-leaves>>
+<<count-internal>>
+<<tree/map>>
+<<value-at-path>>
+<<search>>
+<<update>>
+<<tree/insert>>
+
+(provide repeat)
+(provide invert)
+(provide count-occurrences)
+(provide product)
+(provide every)
+(provide merge)
+(provide flatten)
+
+(provide traverse/preorder)
+(provide traverse/inorder)
+(provide traverse/postorder)
+(provide count-nodes)
+(provide count-leaves)
+(provide count-internal)
+(provide tree/map)
+(provide value-at-path)
+(provide search)
+(provide update)
+(provide tree/insert)
+
+#+END_SRC

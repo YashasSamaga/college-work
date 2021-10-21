@@ -1,0 +1,675 @@
+#+NAME: Homework Assignment 02 : Functional Programming in Elm
+
+* Introduction
+  In this assignment, you are required to solve the same questions
+  that you solved in the homework assignment no. 1 but this time in a
+  different programming language.  For this assignment you will be
+  using the Elm programming language.
+
+* Setup for Elm
+
+** Install
+   You will need to install [[https://elm-lang.org/][Elm]] (v0.19.1) on your system in order to
+   solve the assignment problems.  Along with elm core language, you
+   will need to install the following libraries and tools:
+   1. [[https://nodejs.org/en/][node]] (v12.12.0 or higher) and [[https://www.npmjs.com/get-npm][npm]] (6.14.5 or higher)
+   2. [[https://www.npmjs.com/package/elm-test][elm-test]] (v0.19.1 or higher)
+
+  Run the following to get started with the assignment (in =hws/hw02/=
+  directory):
+  
+  #+BEGIN_SRC sh
+  npm init
+
+  npm install --save elm-test@0.19.1
+
+  elm init
+
+  ./node_modules/elm-test/bin/elm-test init
+  #+END_SRC
+
+  Or if you want you may install elm-test as a global package.  In
+  which case use the following:
+
+  #+BEGIN_SRC sh
+  npm init
+
+  npm install -g elm-test@0.19.1
+
+  elm init
+
+  elm-test init
+  #+END_SRC
+
+
+
+  You should see the following files and directories:
+
+  1. *src/*
+     - Your source (elm) files go here.
+
+  2. *elm.json*
+     - Your installed (elm) packages and other configurations are
+       listed here.
+
+  3. *package.json*
+     - npm configuration can be found here.
+
+  4. *tests/*
+     - your tests will be in this directory.
+
+  5. *tests/Example.elm*
+     - This is a sample module given by elm-test to help you get
+       started writing tests.  You should delete this file otherwise
+       you will get a warning saying: 
+       
+      /... _TEST RUN INCOMPLETE_ because there is 1 TODO remaining .../
+
+  To test your submission, run =elm-test= (if globally installed) or
+  =./node_modules/elm-test/bin/elm-test= (if locally installed) in
+  =hws/hw02=. You will see the number of tests that pass and fail.
+
+* Additional Instructions
+
+  In your repository, your code needs to follow the given structure
+  inside the =hws/hw02/= directory (after extraction from the main org
+  document).
+
+  - src
+    - Main.elm
+
+  When you extract the =index.org= (this document) you will get the
+  following files:
+  - tests/SampleTests.elm
+  - src/Defns.elm
+
+  In your =Main.elm= module you need to have the following header.
+
+#+BEGIN_SRC elm
+module Main exposing (..)
+import Defns exposing (..)
+#+END_SRC
+  
+* Reccursion on Lists
+  
+  A list is created in elm as follows:
+  
+#+BEGIN_SRC elm
+-- empty list
+[]
+
+-- list of numbers
+[1, 3, 5, 10]
+
+-- A list of string
+["a", "b", "c", "e"]
+
+{- This would not work becuase elm is a typed language 
+and a list needs to have the same type of elements. -}
+["a", 2]
+#+END_SRC
+
+  A list can be built incrementally using the =::= operator.
+
+#+NAME: cons-example
+#+BEGIN_SRC elm
+4 :: [] -- [4]
+3 :: [1] -- [3, 1]
+5 :: [6, 7, 10] -- [5, 6, 7, 10]
+#+END_SRC
+  
+** Problem No. 1.1: Repeat
+   Write a function =repeat n x= that returns a list containing =n=
+   copies of =x=.
+   
+   *Type Annotation*: =repeat : Int -> a -> List a=
+
+*** Sample Tests
+
+#+NAME: test-repeat
+#+BEGIN_SRC elm
+test_repeat: Test
+test_repeat =
+    describe "Repeat"
+             [ test "Repeat a number" <| 
+                    \_ -> Expect.equal (repeat 3 5) [5, 5, 5]
+             , test "Repeat a string" <|
+                    \_ -> Expect.equal (repeat 4 "ab") ["ab", "ab", "ab", "ab"]
+             , test "Repeat a list" <|
+                    \_ -> Expect.equal (repeat 2 [1, 4]) [[1, 4], [1, 4]]
+             ]
+#+END_SRC
+
+** Problem No. 1.2: Invert
+   You need to implement a function =invert lst=, where =lst= is a
+   list of 2-lists (lists of length two). This function should return
+   a list with each 2-list reversed.
+
+   You do not need to check if the 2-list if actually a list of
+   length 2.
+
+   *Type Annotation*: =invert : List (List a) -> List (List a)=
+
+*** Sample Tests
+
+#+NAME: test-invert
+#+BEGIN_SRC elm
+test_invert: Test
+test_invert =
+    describe "invert-tests"
+             [ test "2-list is (number number)" <|
+                    \_ -> Expect.equal (invert [[1, 100], [2, 300], [5, 600], [8, 200]])
+                                       [[100, 1], [300, 2], [600, 5], [200, 8]]
+             ]
+#+END_SRC
+
+** Problem No. 1.3: Count Occurrences
+   The function =count_occurrences s slist= returns the number of
+   occurrences of =s= in =slist=.  Implement the function
+   =count_occurrences=.
+
+   The list may contain any type of value that is comparable using the
+   in-built equality operator "==" in elm.
+
+   *Type Annotation*: =count_occurrences : a -> List a -> Int=
+
+*** Sample Tests
+
+#+NAME: test-count-occur
+#+BEGIN_SRC elm
+test_countoccur: Test
+test_countoccur =
+    describe "Count Occurrences"
+             [ test "Multiple Occurrences" <|
+                    \_ -> Expect.equal (count_occurrences 3 [2, 3, 4, 3, 5, 6, 3]) 3
+             ]
+#+END_SRC
+
+
+** Problem No. 1.4: Product
+
+   Write a function =product sos1 sos2=, where =sos1= and =sos2= are
+   each a list without repetitions. The function should return a list
+   of =2-lists= that represents the Cartesian product of sos1 and
+   sos2. If any of the given lists is empty, return an empty list.
+
+   *Type Annotation*: =product : List a -> List a -> List (List a)=
+
+*** Sample Tests
+
+#+NAME: test-product
+#+BEGIN_SRC elm
+test_product: Test
+test_product =
+    describe "Product"
+        [ test "Multiple Item" <|
+               \_ -> Expect.equal (product [1, 3, 4] [10, 20])
+                                  [[1, 10], [1, 20], [3, 10], [3, 20], [4, 10], [4, 20]]
+        ]
+#+END_SRC
+
+** Problem No. 1.5: Every
+
+   A predicate is a function that checks for a certain property on the
+   given aguments(s).  It returns true if the property is valid, and
+   false otherwise.
+
+   You need to implement the function =every pred lst= that returns
+   =False= if any element of lst fails to satisfy pred, and returns
+   =True= otherwise.
+
+   *Type Annotation*: =every : (a -> Bool) -> List a -> Bool=
+
+*** Sample Tests
+
+#+NAME: test-every
+#+BEGIN_SRC elm
+isPositive x = x > 0
+
+test_every : Test
+test_every = 
+    describe "Every"
+             [ test "All Pass" <|
+                    \_ -> Expect.equal (every isPositive [10, 40, 60])
+                                       True
+             , test "One Fail" <|
+                    \_ -> Expect.equal (every isPositive [40, (-20), 100])
+                                       False
+             ]
+#+END_SRC
+   
+   
+** Problem No. 1.6: Merge
+
+   Implement the function =merge loi1 loi2=, where loi1 and loi2 are
+   lists of integers that are sorted in ascending order. This function
+   should return a sorted list of all the integers in loi1 and loi2.
+
+   *Type Annotation*: =merge : List Int -> List Int -> List Int=
+
+*** Sample Tests
+
+#+NAME: test-merge
+#+BEGIN_SRC elm
+test_merge: Test
+test_merge =
+    describe "Merge"
+             [ test "Both lists length > 1" <|
+                    \_ -> Expect.equal (merge [10, 50, 60, 100] [1, 3, 6, 9])
+                                       [1, 3, 6, 9, 10, 50, 60, 100]
+             ]
+#+END_SRC
+
+    
+* Reccursion on Trees
+
+  A Tree is a hierarchical data structure consisting of a root node
+  and a set of sub-trees associated with it.  There are several types
+  of trees (binary tree, multi-way tree, red-black tree etc.) that are
+  defined based on certain properties.  In this assignment we are
+  going to work with binary trees.
+
+  
+** Terminology
+
+*** Node
+    A Node is the basic unit of a tree.  It has a value and it may have
+    a set of sub-trees associated with it.
+    
+*** Internal Node
+    An internal node has a non-empty set of sub-trees.
+
+*** Leaf Node
+    A Leaf node only has a value.  It does not have any sub-trees.
+
+*** Root Node
+    A root node is considered the first node of the tree.  There is
+    only one root node in a tree.
+
+*** Parent Node
+    Assume : 
+    - T is a Tree with root node A.
+    - T' is a sub-tree of T with root node B.
+    
+    A is called the Parent node of B.
+
+*** Child Node
+    The root node of each sub-tree associated with a tree node is a
+    child of that node.
+
+
+** Full Binary Tree
+   A Binary Tree is a Tree in which each node can have a maximum of
+   two children associated with it.  A full binary tree can only have
+   either 0 or 2 children.
+   
+   As a common convention the first child is called the left child and
+   the second one is called the right child.
+   
+   For simplicity, in this assignment we will only allow integer
+   values in nodes.
+
+   You need to use the given data-type definition for
+   full-binary-tree.
+
+#+NAME: full-binary-tree
+#+BEGIN_SRC elm
+type Tree = Leaf Int | Node Int Tree Tree
+#+END_SRC
+
+*** Sample Tree Instances
+    These tree instances are used in the sample tests.
+
+#+NAME: sample-trees
+#+BEGIN_SRC elm
+singleton_tree = Leaf 10
+
+regular_tree =
+    Node 100
+         (Node 50
+               (Node 200
+                     (Leaf 5)
+                     (Leaf 6))
+               (Leaf 80))
+         (Leaf 40)
+#+END_SRC
+   
+** Traversal
+   Traversing a tree requires visiting each node in the tree in a
+   specific order.  You need to implement traversal functions for
+   each of the orders defined below:
+
+*** Problem No. 2.1 : Preorder Traversal
+    The function =preorder tree= takes a full binary tree as a
+    parameter and returns a list containing values of each node in
+    =tree= following =preorder= traversal.
+
+    *Type Annotation* : =preorder : Tree -> List Int=
+
+**** Sample Tests
+
+#+NAME: test-preorder
+#+BEGIN_SRC elm
+test_preorder : Test
+test_preorder =
+    describe "Preorder"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (preorder singleton_tree)
+                                         [10]
+             , test "larger" <|
+                    \_ -> Expect.equal (preorder regular_tree)
+                                         [100, 50 ,200, 5, 6, 80, 40]
+             ]
+#+END_SRC
+*** Problem No. 2.2 : Inorder
+    The function =(inorder tree)= takes a full binary tree
+    as a parameter and returns a list containing values of each node
+    in =tree= following =inorder= traversal.
+
+    *Type Annotation* : =inorder : Tree -> List Int=
+
+**** Sample Tests
+
+#+NAME: test-inorder
+#+BEGIN_SRC elm
+test_inorder : Test
+test_inorder =
+    describe "Inorder"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (inorder singleton_tree)
+                                         [10]
+             , test "larger" <|
+                    \_ -> Expect.equal (inorder regular_tree)
+                                         [5, 200, 6, 50, 80, 100, 40]
+             ]
+#+END_SRC
+
+*** Problem No. 2.3 : Postorder
+    The function =(postorder tree)= takes a full binary tree
+    as a parameter and returns a list containing values of each node
+    in =tree= following =postorder= traversal.
+
+    *Type Annotation* : =postorder : Tree -> List Int=
+
+**** Sample Tests
+    
+#+NAME: test-postorder
+#+BEGIN_SRC elm
+test_postorder : Test
+test_postorder =
+    describe "Postorder"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (postorder singleton_tree)
+                                         [10]
+             , test "larger" <|
+                    \_ -> Expect.equal (postorder regular_tree)
+                                         [5, 6, 200, 80, 50, 40, 100]
+             ]
+#+END_SRC
+
+
+** Count Nodes
+   
+*** Problem No. 2.4 : Count All Nodes
+    The function =count_nodes tree= should return the number of nodes
+    in the =tree=.
+
+    *Type Annotation* : =count_nodes : Tree -> Int=
+    
+**** Sample Tests
+    
+#+NAME: test-count-nodes
+#+BEGIN_SRC elm
+test_count_nodes: Test
+test_count_nodes =
+    describe "Count Nodes"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (count_nodes singleton_tree)
+                                       1
+             , test "larger" <|
+                    \_ -> Expect.equal (count_nodes regular_tree)
+                                       7
+             ]
+#+END_SRC
+
+*** Problem No. 2.5 : Count Leaf Nodes
+    The function =count-leaves tree= should return the number of leaf
+    nodes in the given =tree=.
+
+    *Type Annotation* : =count_leaves : Tree -> Int=
+
+**** Sample Tests
+    
+#+NAME: test-count-leaves
+#+BEGIN_SRC elm
+test_count_leaves: Test
+test_count_leaves =
+    describe "Count Leaves"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (count_leaves singleton_tree)
+                                       1
+             , test "larger" <|
+                    \_ -> Expect.equal (count_leaves regular_tree)
+                                       4
+             ]
+#+END_SRC
+    
+
+*** Problem No. 2.6 : Count Internal Nodes
+    The function =count-internal tree= should return the number of
+    leaf nodes in the given =tree=.
+
+    *Type Annotation* : =count_internal : Tree -> Int=
+
+**** Sample Tests
+    
+#+NAME: test-count-internal
+#+BEGIN_SRC elm
+test_count_internal: Test
+test_count_internal =
+    describe "Count Internals"
+             [ test "singleton" <|
+                    \_ -> Expect.equal (count_internal singleton_tree)
+                                       0
+             , test "larger" <|
+                    \_ -> Expect.equal (count_internal regular_tree)
+                                       3
+             ]
+#+END_SRC
+
+
+** Problem No. 2.7 : Map
+   The function =treed_map fn tree= returns a tree that results from
+   applying the function =fn= to the *value* of each node in the tree.
+   
+   This function is similar to the map function for lists.  It should
+   not change the structure of the tree.
+
+   *Type Annotation* : =tree_map : (Int -> Int) -> Tree -> Tree=
+
+**** Sample Tests
+    
+#+NAME: test-tree-map
+#+BEGIN_SRC elm
+test_tree_map : Test
+test_tree_map =
+    describe "Tree Map"
+         [ test "singleton" <|
+                \_ -> Expect.equal (tree_map
+                                   (\v -> v+1)
+                                   singleton_tree)
+                                   (Leaf 11)
+         , test "No change" <|
+                \_ -> Expect.equal (tree_map
+                                   (\v -> v)
+                                   regular_tree)
+                                   (regular_tree)
+         ]
+#+END_SRC
+
+
+** Path
+   Path is a list of directions or steps that that locate any node in
+   a tree.  In a binary tree, there are only two directions (left and
+   right).  So a sequence such as =[Left, Right]= can identify any
+   node in a binary tree.  Every node in a tree has a unique path and
+   can be used to perform operations on a specific node in a tree.
+
+   Path items are defined below:
+
+#+NAME: path-def
+#+BEGIN_SRC elm
+type PathItem = Left | Right
+#+END_SRC
+
+   All paths are by default considered relative to the current path.
+   Therefore, the empty path represent the fact that the current node
+   is the target of the path (required node).
+
+*** Problem No. 2.8 : Value at Path
+    The function =value_at_path path tree= should return the value of
+    the node at given =path= (if it exists) in the =tree=.
+
+    If the value does not exist return =Nothing=.
+
+    *Type Annotation* =value_at_path : List PathItem -> Tree -> Maybe Int=
+
+    =Nothing= is a [[https://package.elm-lang.org/packages/elm/core/latest/Maybe][Maybe Type]] defined in elm/core.
+
+**** Sample Tests
+    
+#+NAME: test-vap
+#+BEGIN_SRC elm
+test_value_at_path: Test
+test_value_at_path =
+    describe "Value at Path"
+             [ test "left-right" <|
+                    \_ -> Expect.equal (value_at_path
+                                              [Left, Right]
+                                              regular_tree)
+                                             (Just 80)
+             , test "root" <|
+                    \_ -> Expect.equal (value_at_path 
+                                              []
+                                              regular_tree)
+                                             (Just 100)
+             , test "nothing" <|
+                    \_ -> Expect.equal (value_at_path 
+                                              [Left, Right]
+                                              singleton_tree)
+                                             Nothing
+             ]
+#+END_SRC
+
+*** Problem No. 2.9 : Search
+    Given a full binary tree, the function =search val tree= should
+    return the =path= to the first occurrence (as it would occur in
+    the pre-order traversal) of any node with value =val= (which we
+    have defined to be an integer for our tree data-type).
+
+    You need to return a Maybe type here.  If the value is not found,
+    return Nothing.
+
+    *Type Annotation* =search : Int -> Tree -> Maybe (List PathItem)=
+
+**** Sample Tests
+    
+#+NAME: test-search
+#+BEGIN_SRC elm
+test_search: Test
+test_search =
+    describe "Search"
+             [ test "found" <|
+                    \_ -> Expect.equal (search
+                                              200
+                                              regular_tree)
+                                             (Just [Left, Left])
+             ]
+#+END_SRC
+
+*** Problem No. 2.10 : Update
+    The =update path fn tree= function returns a tree that results
+    from replacing the value of the node at given =path= in =tree= by
+    applying the =fn= function to the node value at =path=.
+
+    *Type Annotation* =update : List PathItem -> (Int -> Int) -> Tree -> Tree=
+
+**** Sample Tests
+    
+#+NAME: test-update
+#+BEGIN_SRC elm
+test_update : Test
+test_update =
+    describe "Update"
+             [ test "update" <|
+                    \_ -> Expect.equal (update
+                                              [Left]
+                                              (\x -> x+1)
+                                              singleton_tree)
+                                       (Leaf 10)
+             ]
+#+END_SRC
+
+*** Problem No. 2.11 : Insert
+    =tree_insert path lst rst tree=. Given a path insert the given
+    =lst= and =rst= nodes at a leaf node with the =path=.
+
+    Do nothing if the path is incorrect.
+
+    *Type Annotation* =tree_insert : List PathItem -> Tree -> Tree -> Tree -> Tree=
+
+**** Sample Tests
+     
+#+NAME: test-insert
+#+BEGIN_SRC scheme
+test_insert =
+    describe "Insert"
+             [ test "insert" <|
+                    \_ -> Expect.equal (tree_insert
+                                      []
+                                      (Leaf 3)
+                                      (Leaf 5)
+                                      singleton_tree)
+                                 (Node 10
+                                       (Leaf 3)
+                                       (Leaf 5))
+             ]
+#+END_SRC
+
+* Tangle
+  
+#+BEGIN_SRC elm :noweb yes :padline no :tangle ./tests/SampleTests.elm
+module SampleTests exposing (..)
+import Expect exposing (Expectation)
+import Test exposing (..)
+import Main exposing (..)
+import Defns exposing (..)
+
+<<test-repeat>>
+<<test-invert>>
+<<test-count-occur>>
+<<test-product>>
+<<test-every>>
+<<test-merge>>
+<<sample-trees>>
+<<test-preorder>>
+<<test-inorder>>
+<<test-postorder>>
+<<test-count-nodes>>
+<<test-count-leaves>>
+<<test-count-internal>>
+<<test-tree-map>>
+<<path-items>>
+<<test-vap>>
+<<test-search>>
+<<test-update>>
+<<test-insert>>
+
+#+END_SRC
+
+#+BEGIN_SRC elm :noweb yes :padline no :tangle ./src/Defns.elm
+module Defns exposing (..)
+
+<<full-binary-tree>>
+<<path-def>>
+#+END_SRC

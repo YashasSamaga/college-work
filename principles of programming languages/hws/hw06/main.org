@@ -1,0 +1,676 @@
+
+#+title: Homework Assignment No. 6 : Functional Language
+
+* About this Assignment
+
+  In this assignment, you are required to implement a parser and
+  interpreter for the *FUNCTIONAL LANGUAGE*.
+  
+  The functional language extends the lexical language with the
+  =function= construct.
+
+
+  The language consists of the following:
+  
+ - 1. Concrete syntax ::  for programs in the arithmetic
+      language.  Specified as a  CFG.  *Given*
+      
+ - 2. Abstract syntax ::  for programs in the arithmetic
+      language.  Specified using a =define-datatype=.
+      *Given*.
+
+ - 3. Parser :: converts concrete syntax to abstract
+                syntax.  *To be implemented by you*.
+
+ - 4. Expressible values :: a definition of domain of values
+      expressed, or returned as a result of evaluation.
+      *Given*.
+
+ - 5. Denotable values :: A definition of domain values that can be
+      referenced by identifiers.
+
+ - 6. Environment :: definition of the evaluation context used for
+                     lexically scoped variable bindings. *Given*
+
+ - 8. Interpreter :: A program that maps abstract syntax to
+                     expressible values.  *To be implemented by you*
+  
+*NOTE*: Exception handling for lookup, parsing and evaluation in the
+previous assignment is not included here.  You do not need to raise
+any special exceptions, you can raise the generic exception for
+parsing and evaluation errors.
+
+* Concrete Syntax of the Functional Language
+
+  This section describes the concrete syntax of the LEXICAL language.
+
+  Two new constructs =function= and function application are added.
+
+#+BEGIN_SRC bnf
+<exp> ::= <number>
+        | <boolean>
+        | <symbol>
+        | (ifte <exp> <exp> <exp>)
+        | (assume ([<symbol> <exp>]*) <exp>)
+        | (<function> (<symbol>*) <exp>)
+        | (<exp> <exp>*)
+#+END_SRC
+
+* Abstract Syntac of Functional Language
+
+** The AST Datatype Definition (Given)
+
+   In this section, you are provided with the AST for the Functional
+   Language.
+
+#+NAME: ast
+#+BEGIN_SRC racket
+(define-datatype ast ast?
+  [num (datum number?)]
+  [bool (datum boolean?)]
+  [ifte (test ast?) (then ast?) (else-ast ast?)]
+  [function
+   (formals (list-of id?))
+   (body ast?)]
+  [app (rator ast?) (rands (list-of ast?))]
+  [id-ref (sym id?)]
+  [assume (binds  (list-of bind?)) (body ast?)])
+
+(define-datatype bind bind?
+  [make-bind (b-id id?) (b-ast ast?)])
+
+;;; bind-id : bind? -> id?
+(define bind-id
+  (lambda (b)
+    (cases bind b
+      [make-bind (b-id b-ast) b-id])))
+
+;;; bind-ast : bind? -> ast?
+(define bind-ast
+  (lambda (b)
+    (cases bind b
+      [make-bind (b-id b-ast) b-ast])))
+#+END_SRC
+
+   Two new constructs have been added that were not present in the
+   lexical language: =function= and =app=.
+
+** Function
+
+   The =function= construct allows you to write a function.  This
+   function can be applied to the given arguments using =app=.
+
+   A function to add two numbers can be defined as follows:
+   
+#+BEGIN_EXAMPLE
+(function (x y) (+ x y))
+#+END_EXAMPLE
+
+   This function can be applied to given numbers:
+
+#+BEGIN_EXAMPLE
+((function (x y) (+ x y)) 4 5)
+#+END_EXAMPLE
+
+   A function can be bound to an identifier:
+
+#+BEGIN_EXAMPLE
+(assume ([sub (function (a b) (- a b))])(sub 10 3))
+#+END_EXAMPLE
+
+
+
+* Parser (YOU NEED TO IMPLEMENT THIS)
+
+  You need to implement the =parse= function that converts the
+  concrete syntax of the functional lanauge into the ast
+  representation.
+
+** Solution
+
+*** Step 1:
+
+- number -> make (num exp) node
+- boolean -> make (bool exp) node
+- symbol -> make (id-ref exp) node
+
+split into four situations:
+- 3 items in the list (assume list-of-list body) and first item is 'assume
+- 3 items in the list (function args (parse body)) and first item is 'function
+- 4 items in the list (if expr expr expr)
+- else it's an application: (app (parse rator) (map parse args))
+
+assume is processed as: (assume bindings (parse body)) where bindings is a list of make-bind
+
+if is processed as: (ifte (parse testexpr) (parse thenexpr) (parse elseexpr))
+
+
+*** Final Solution:
+  
+#+NAME: parser
+#+BEGIN_SRC racket
+(define *keywords*
+  '(ifte function assume))
+
+(define id?
+  (lambda (x)
+    (and
+     (symbol? x)
+     (not (memq x *keywords*)))))
+
+;;; parse :: any/c -> ast?  Raises exception exn?
+;;; Fill in the function parse here
+(define (parse exp)
+  (cond
+    [(number? exp) (num exp)]
+    [(boolean? exp) (bool exp)]
+    [(id? exp) (id-ref exp)]
+    [(and (list? exp) (= (length exp) 3) (equal? (first exp) 'assume))
+      (let* ([bindingsraw (second exp)] [body (third exp)]
+             [bindings (map (lambda (entry) (make-bind (first entry) (parse (second entry)))) bindingsraw)])
+        (assume bindings (parse body))
+      )
+    ]
+    [(and (list? exp) (= (length exp) 3) (equal? (first exp) 'function))
+      (let ([args (second exp)] [body (third exp)])
+        (if (andmap id? args)
+          (function args (parse body))
+          (raise "formal parameters must be identifiers")
+        )
+      )
+    ]
+    [(and (list? exp) (= (length exp) 4) (equal? 'if (first exp)))
+      (let* ([testexpr (second exp)] [thenexpr (third exp)] [elseexpr (fourth exp)])
+        (ifte (parse testexpr) (parse thenexpr) (parse elseexpr))
+      )
+    ]
+    [(and (list? exp))
+      (let ([rator (first exp)] [args (rest exp)])
+        (app (parse rator) (map parse args))
+      )
+    ]
+    [else raise "unknown language construct"]
+  )
+)
+#+END_SRC
+
+
+** Tests
+
+#+NAME: test-parser
+#+BEGIN_SRC racket
+(define test-function-parsing
+  (test-suite "Function Parsing"
+              (test-case "Identity Function"
+                (check-equal? (parse iden-fn)
+                              (function '(x) (id-ref 'x))))
+              
+              (test-case "No Params"
+                (check-equal? (parse const-fn)
+                              (function '() (num 1))))
+              
+              (test-case "Two Params"
+                (check-equal? (parse sum-fn)
+                              (function '(p q)
+                                        (app (id-ref '+)
+                                             (list (id-ref 'p) (id-ref 'q))))))
+              (test-case "Parse Error - function"
+               (check-exn exn:fail?
+                          (lambda () 
+                            (parse '(function (a))))))
+
+              (test-case "Parse Error - assume"
+               (check-exn exn:fail?
+                          (lambda () 
+                            (parse '(assume)))))))
+#+END_SRC
+
+   
+* Semantic Domain
+
+  The expressible and denotable values now include procedures along
+  with numbers and booleans.  A =Procedure= is the ast representation
+  of a function.
+
+** Procedure
+  
+   A procedure is either a =prim-proc= or a =closure=.  A =prim-proc=
+   refers to an inbuilt scheme procedure.  A closure is used for a
+   user-defined function.
+   
+#+NAME: proc
+#+BEGIN_SRC racket
+(define-datatype proc proc?
+  [prim-proc
+    ;; prim refers to a scheme procedure
+    (prim procedure?)
+    ;; sig is the signature
+    (sig (list-of procedure?))] 
+  [closure
+    (formals (list-of symbol?))
+    (body ast?)
+    (env env?)])
+
+;;; prim? : proc? -> boolean?
+(define prim-proc?
+  (lambda (p)
+    (cases proc p
+      [prim-proc (prim sig) #t]
+      [else #f])))
+
+(define closure? 
+  (lambda (p)
+    (cases proc p
+      [prim-proc (prim sig) #f]
+      [else #t])))
+#+END_SRC
+
+*** Signature (Sig)
+    The signature of a =prim-proc= defines the type of its return
+    value and the type of each of its parameters.
+
+    It is a list of predicates in which the first element denotes the
+    return type and the rest of the list denotes the types of each of
+    the arguments.
+
+    For example, the signature of =<= (less than) would be =(list
+    boolean? number? number?)=.
+
+*** Closure
+
+    A closure provides the execution context (environment) required to
+    evaluate the function.  A closure consists of the three things:
+    formals, body and env.
+
+    - Formals is the list of symbols that denote the formal parameters of
+    the function.
+
+    - Body is the expression that is evaluated to given the result of
+    function evaluation.
+
+    - Env is the environment (context) in which the boby is evaluated.
+    
+    During the evalution (application) of a function, the environment
+    contains bindings for all the formal parameters.
+    
+**** Lexical Scoping
+
+     The env stored in a closure contains bindings as they exit during
+     the creation of the closure.  This ensures that the result of
+     evaluation does not depend on values of free variables during
+     evaluation.  This is refered to as lexical scoping.
+
+
+     
+** Expressible Values
+
+   Types of values returned by evaluating an ast.
+
+#+BEGIN_SRC bnf
+<expressible-value> ::= <number> | <boolean> | <proc>
+#+END_SRC
+
+#+NAME: expressible-value
+#+BEGIN_SRC racket
+;;; expressible-value? : any/c -> boolean?
+(define expressible-value?
+  (or/c number? boolean? proc?))
+#+END_SRC
+
+** Denotable Values
+
+   Types of values denoted by identifiers.
+
+#+BEGIN_SRC bnf
+<denotable-value> ::= <number> | <boolean> | <proc>
+#+END_SRC
+
+#+NAME: denotable-value
+#+BEGIN_SRC racket
+;;; denotable-value? :any/c -> boolean?
+(define denotable-value?
+  (or/c number? boolean? proc?))
+#+END_SRC
+
+
+* Operators as Procedures (YOU NEED TO IMPLEMENT THIS)
+
+  In the lexical language we defined operators as separate constructs.
+  In this language we will use the new =prim-proc= construct to
+  implement operators.
+  
+  The initial environment will contain bindings for all the operator
+  symbols.  You need to implement the corresponding procedures for
+  each operator.
+
+
+  Operators: 
+  - + :: Add two numbers
+  - - :: Sub two numbers
+  - * :: Product of two numbers
+  - / :: Divide first number by the second non-zero number.
+  - < :: (< a b) -> a is less than b?
+  - <= :: less than or equal?
+  - eq? :: two numbers (or booleans) are equal?
+  - 0? :: is the given number equal to zero?
+  - ! :: negation (#t -> #f, #f -> #t)
+
+#+NAME: init-env
+#+BEGIN_SRC racket
+(define *init-env*
+  (extended-env
+   '(+ - * / < <= eq? 0? !)
+   (list +p -p *p /p <p <=p eq?p 0?p !p)
+   (empty-env)))
+#+END_SRC
+  
+#+NAME: prim-proc
+#+BEGIN_SRC racket
+;;; implement all procedures in the list
+(define (numberOrBoolean? v) (or (number? v) (boolean? v)))
+
+(define +p (prim-proc + (list number? number?)))
+(define -p (prim-proc - (list number? number?)))
+(define *p (prim-proc * (list number? number?)))
+(define /p (prim-proc / (list number? number?)))
+(define <p (prim-proc < (list number? number?)))
+(define <=p (prim-proc <= (list number? number?)))
+(define eq?p (prim-proc eq? (list numberOrBoolean? numberOrBoolean?)))
+(define 0?p (prim-proc zero? (list number?)))
+(define !p (prim-proc not (list boolean?)))
+#+END_SRC
+
+** Tests
+
+#+NAME: test-prim-proc
+#+BEGIN_SRC racket
+(define test-operator-functions
+  (test-suite "Operator Function"
+              (test-case "Add"
+                          (check-equal? (eval-ast (app (id-ref '+) (list (num 10) (num 10))) *init-env*)
+                                        20))                        
+              (test-case "Sub"
+                          (check-equal? (eval-ast (app (id-ref '-) (list (num 40) (num 10))) *init-env*)
+                                        30))
+              (test-case "Product"
+                          (check-equal? (eval-ast (app (id-ref '*) (list (num 5) (num 5))) *init-env*)
+                                        25))
+              (test-case "Div"
+                          (check-equal? (eval-ast (app (id-ref '/) (list (num 100) (num 5))) *init-env*)
+                                        20))
+              (test-case "lt-f"
+                          (check-equal? (eval-ast (app (id-ref '<) (list (num 200) (num 10))) *init-env*)
+                                        #f))
+              (test-case "lt-t"
+                          (check-equal? (eval-ast (app (id-ref '<) (list (num 1) (num 5))) *init-env*)
+                                        #t))
+              (test-case "neg"
+                          (check-equal? (eval-ast (app (id-ref '!) (list (bool #t))) *init-env*)
+                                        #f))
+              (test-case "neg-t"
+                          (check-equal? (eval-ast (app (id-ref '!) (list (bool #f))) *init-env*)
+                                        #t))
+              (test-case "<=p"
+                          (check-equal? (eval-ast (app (id-ref '<=) (list (num 1) (num 1))) *init-env*)
+                                        #t))
+              (test-case "0?p"
+                          (check-equal? (eval-ast (app (id-ref '0?) (list (num 0))) *init-env*)
+                                        #t))
+              (test-case "eq?p"
+                          (check-equal? (eval-ast (app (id-ref 'eq?) (list (num 1) (num 1))) *init-env*)
+                                        #t))
+              (test-case "eq?p - #f"
+                          (check-equal? (eval-ast (app (id-ref 'eq?) (list (num 4) (num 1))) *init-env*)
+                                        #f))))
+#+END_SRC
+  
+   
+* Environment
+
+  Evaluating expressions requires an evaluation context that keeps
+  track of the variable bindings.  This evaluation context is known as
+  an environment.
+
+  An env is a union type of either:
+
+  *empty-env* : An environment that does not have any
+  variable bindings.
+
+  OR
+
+  *extended-env* : An extended environment consisting of a list of
+  symbols, a list of denotable values and an outer environment.
+
+
+  In the last assignment (lexical) we used the define-datatype
+  construct to create the environment.  Here, we will use a procedural
+  representation of environments.  Both environments behave the same.
+
+#+NAME: env
+#+BEGIN_SRC racket
+(define env? procedure?)
+
+
+;;; lookup-env: [env?  symbol?] -> any/c
+;;; lookup-env: throws "unbound identifier" error
+(define lookup-env
+  (lambda (e x)
+    (e x)))
+
+;;; empty-env : () -> env?
+(define empty-env
+  (lambda ()
+    (lambda (x)
+      (error 'empty-env "unbound identifier ~a" x))))
+
+;;; extended-env :
+;;;    [(list-of symbol?) (list-of any/c) env?] -> env?
+(define extended-env
+  (lambda (syms vals outer-env)
+    (lambda (x)
+      (let ([j (list-index syms x)])
+        (cond
+          [(= j -1) (lookup-env outer-env x)]
+          [#t (list-ref vals j)])))))
+
+;;; Returns the loction of the element in a list, -1 if the
+;;; element is absent.
+
+;;; list-index : [(listof any/c)  any/c] -> 
+(define list-index
+  (lambda (ls a)
+    (letrec ([loop
+               (lambda (ls ans)
+                 (cond
+                   [(null? ls) -1]
+                   [(eq? (first ls) a) ans]
+                   [#t (loop (rest ls) (+ 1 ans))]))])
+      (loop ls 0))))
+#+END_SRC
+
+
+* Interpreter (YOU NEED TO IMPLEMENT THIS)
+
+  The =eval-ast= function takes an =ast= and the corresponding =env=
+  (that contains bindings for evaluation of the =ast=) and returns the
+  evaluated expressible value.
+  
+*** Step 1:
+
+The AST has seven types of nodes: num, bool, id-ref, function, assume, ifte and app. The first step is to have a case expression to match the variant type.
+
+- num node: return the number contained in the node 
+- boolean node: return the bool contained in the node
+- id-ref node: lookup symbol and return (eval-ast expr) where expr is the ast of the bound symbol
+- function node: return a closure with current environment
+- assume node: evaluate the body of the assume node with a new extended environment consisting of the assume bindings and the current environement as the outer environment
+- ifte node: (eval-ast testexpr) first and then evaluate the correct branch based on the test expression result
+- app node: check whether the function is a closure or primitive; if it's a function, evaluate arguments, create a new extended environment with the args and evaluate the body in that new enviornment
+
+
+#+NAME: eval-ast
+#+BEGIN_SRC racket
+(define (eval-ast a e)
+  (define (typecheck-num v)
+    (if (number? v)
+      v
+      (raise "expected number")
+    )
+  )
+  (define (typecheck-bool v)
+    (if (boolean? v)
+      v
+      (raise "expected bool")
+    )
+  )
+  (cases ast a
+    [num (n) n]
+    [bool (b) b]
+    [id-ref (sym) (lookup-env e sym)]
+    [assume (bindings body)
+      (define (extract-bindings bindings)
+        (define (loop bindings syms vals)
+          (cond
+            [(null? bindings) (list syms vals)]
+            [else
+              (let* ([binding (first bindings)] [id (bind-id binding)] [expr (bind-ast binding)])
+                (loop (rest bindings) (cons id syms) (cons (eval-ast expr e) vals))
+              )
+            ]
+          )
+        )
+        (loop bindings null null)
+      )
+      (let* ([unpacked (extract-bindings bindings)] [syms (first unpacked)] [vals (second unpacked)])
+        (eval-ast body (extended-env syms vals e))
+      )
+    ]
+    [ifte (testexpr thenexpr elseexpr)
+      (if (typecheck-bool (eval-ast testexpr e))
+        (eval-ast thenexpr e)
+        (eval-ast elseexpr e)
+      )
+    ]
+    [function (formals body)
+      (closure formals body e)
+    ]
+    [app (rator rands)
+      (cases proc (eval-ast rator e)
+        [closure (formals body gamma)
+          (eval-ast body (extended-env formals (map (lambda (ast) (eval-ast ast e)) rands) gamma))
+        ]
+        [prim-proc (prim sig)
+          (apply prim (map (lambda (ast) (eval-ast ast e)) rands))
+        ]
+      )
+    ]
+  )
+)
+#+END_SRC
+
+
+** Tests
+
+#+NAME: test-eval-ast
+#+BEGIN_SRC racket
+(define test-function-evaluation
+  (test-suite "Function Evaluation"
+              (test-case "Identity Function"
+                (check-equal? (eval-ast (parse apply-iden-fn) *init-env*)
+                              10))
+              (test-case "No Params"
+                (check-equal? (eval-ast (parse apply-const-fn) *init-env*)
+                              1))
+              (test-case "Two Params"
+                (check-equal? (eval-ast (parse apply-sum-fn) *init-env*)
+                              40))
+              (test-case "Function Bound to identifier"
+                (check-equal? (eval-ast (parse fn-with-assume) *init-env*)
+                              8))
+              (test-case "Function Parameter overrides the assume binding"
+                (check-equal? (eval-ast (parse fn-override-binding) *init-env*)
+                              70))
+              (test-case "Eval Error"
+               (check-exn exn:fail?
+                          (lambda () 
+                            (eval-ast (app (id-ref '/) (list (num 20) (num 0))) *init-env*))))
+              (test-case "Eval Error - prim op - incorrect value"
+               (check-exn exn:fail?
+                          (lambda () 
+                            (eval-ast (app +p (list (bool #t) (num 0))) *init-env*))))
+              (test-case "Eval Error - prim op - incorrect # of params"
+               (check-exn exn:fail?
+                          (lambda () 
+                            (eval-ast (app +p (list (num 0))) *init-env*))))))
+#+END_SRC
+
+* Tangle
+
+
+#+BEGIN_SRC racket :noweb yes :tangle ./main-tang.rkt
+#lang racket
+
+(require eopl)
+
+<<ast>>
+<<env>>
+<<parser>>
+<<proc>>
+<<expressible-value>>
+<<denotable-value>>
+<<prim-proc>>
+<<init-env>>
+<<eval-ast>>
+
+
+(provide (all-defined-out))
+#+END_SRC
+
+#+BEGIN_SRC racket :noweb yes :tangle ./test-tangled.rkt
+#lang racket
+
+(require eopl)
+(require rackunit)
+(require racket/match)
+(require rackunit/text-ui)
+(require "main-tang.rkt")
+
+
+(define iden-fn '(function (x) x))
+(define apply-iden-fn '((function (x) x) 10))
+
+(define const-fn '(function () 1))
+(define apply-const-fn '((function () 1)))
+
+(define sum-fn '(function (p q) (+ p q)))
+(define apply-sum-fn '((function (p q) (+ p q)) 10 30))
+
+(define fn-with-assume '(assume ([sub-2 (function (x) (- x 2))]) (sub-2 10)))
+
+(define fn-override-binding '(assume ([a 10])((function (a b) (+ a b)) 30 40)))
+
+
+
+<<test-parser>>
+<<test-prim-proc>>
+<<test-eval-ast>>
+
+
+(define test-function
+  (test-suite "Function Tests"
+              test-function-parsing
+              test-function-evaluation
+              test-operator-functions))
+
+
+(define run-all-tests 
+  (lambda ()
+    (run-tests test-function)))
+
+
+(module+ test
+  (run-all-tests))
+#+END_SRC
+  
+  
+  

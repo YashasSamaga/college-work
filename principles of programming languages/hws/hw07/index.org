@@ -1,0 +1,599 @@
+#+title: Recursive Language
+
+* Assignment on Recursive Language
+
+In this assignment, you are required to implement a parser and
+interpreter for the *RECURSIVE LANGUAGE*.
+  
+The recursive language extends the functional language with the
+=recursive= construct.
+
+The language consists of the following:
+  
+- 1. Concrete syntax ::  for programs in the arithmetic
+      language.  Specified as a  CFG.  *Given*
+      
+- 2. Abstract syntax ::  for programs in the arithmetic
+      language.  Specified using a =define-datatype=.
+      *Given*.
+
+- 3. Parser :: converts concrete syntax to abstract
+                syntax.  *To be implemented by you*.
+
+- 4. Expressible values :: a definition of domain of values
+      expressed, or returned as a result of evaluation.
+      *Given*.
+
+- 5. Denotable values :: A definition of domain values that can be
+      referenced by identifiers.
+
+- 6. Environment :: definition of the evaluation context. *Given (You
+                    need to implement the lookup function)*
+
+- 8. Interpreter :: A program that maps abstract syntax to
+                     expressible values.  *To be implemented by you*
+
+
+* Limitation of the Functional Language
+
+** =function= cannot handle recursive functions
+The =function= construct does not allow you to write a recursive
+function.
+
+Let's say you want to define the factorial function.
+
+#+BEGIN_EXAMPLE
+(assume ([factorial (function (n)
+                      (ifte (eq? 0 n) 
+                      1 
+                      (* n (factorial (- n 1)))))])
+  (factorial 4))
+#+END_EXAMPLE
+
+
+This would parse, but you may get an error during evaluation because
+the environment in the closure for the factorial function does not
+contain the binding for =factorial= that you just defined.
+
+Note that you may not get an error if the environment has some other
+function bound to =factorial= defined earlier, but that is not the
+intended behavior.
+
+
+* A new construct for recursive bindings
+To ovecome the limitations discussed above, we introduce a new
+construct called =recursive=.  The =recursive= construct allows you to
+use any binding from the current set of bindings in the bound
+expressions.
+
+* Concrete Syntax for recursive
+The syntax for =recursive= is similar to =assume=.
+
+#+BEGIN_SRC bnf
+<exp> ::= (recursive ([<symbol> (<symbol>*) <exp>]*) <exp>)
+#+END_SRC
+
+The complete grammar for the recursive language is as follows:
+
+#+BEGIN_SRC bnf
+<exp> ::= <number>
+        | <boolean>
+        | <symbol>
+        | (ifte <exp> <exp> <exp>)
+        | (assume ([<symbol> <exp>]*) <exp>)
+        | (function (<symbol>*) <exp>)
+        | (recursive ([<symbol> (<symbol>*) <exp>]*) <exp>)
+        | (<exp> <exp>*)
+#+END_SRC
+
+
+The example (factorial) seen above can be written using the
+=recursive= construct as follows:
+
+#+BEGIN_SRC 
+(recursive ([factorial (n) 
+               (ifte (eq? 0 n) 
+                     1 
+                     (* n (factorial (- n 1))))])
+  (factorial 4))
+#+END_SRC
+  
+
+* AST representation for recursive bindings
+The following variant is added to the AST to represent the recursive
+bindings.
+
+#+BEGIN_SRC racket
+[recursive (fbinds (list-of fbind?)) (body ast?)]
+#+END_SRC
+
+The complete AST for the Recursive Lanauge is as follows:
+
+#+NAME: ast
+#+BEGIN_SRC racket
+(define-datatype ast ast?
+  [num (datum number?)]
+  [bool (datum boolean?)]
+  [ifte (test ast?) (then ast?) (else-ast ast?)]
+  [function
+   (formals (list-of id?))
+   (body ast?)]
+  [recursive (fbinds (list-of fbind?)) (body ast?)]
+  [app (rator ast?) (rands (list-of ast?))]
+  [id-ref (sym id?)]
+  [assume (binds  (list-of bind?)) (body ast?)])
+
+(define-datatype bind bind?
+  [make-bind (b-id id?) (b-ast ast?)])
+
+;;; bind-id : bind? -> id?
+(define bind-id
+  (lambda (b)
+    (cases bind b
+      [make-bind (b-id b-ast) b-id])))
+
+;;; bind-ast : bind? -> ast?
+(define bind-ast
+  (lambda (b)
+    (cases bind b
+      [make-bind (b-id b-ast) b-ast])))
+#+END_SRC
+
+** =fbind= datatype
+The =fbind= datatype is used to define a function binding in the
+=recursive= bindings.
+
+There is only one variant =make-fbind= with the following fields:
+
+- =fb-id= :: function identifier.
+- =fb-formals= :: list of parameters for the function.
+- =fb-body= :: body of the function.
+
+#+NAME: fbind
+#+BEGIN_SRC racket
+(define-datatype fbind fbind?
+  [make-fbind (fb-id id?)
+              (fb-formals (list-of id?))
+              (fb-body ast?)])
+
+;;; fbind-id : fbind? -> id?
+(define fbind-id
+  (lambda (b)
+    (cases fbind b
+      [make-fbind (fb-id fb-formals fb-body) fb-id])))
+
+;;; fbind-formals : fbind? -> (list-of id?)
+(define fbind-formals
+  (lambda (b)
+    (cases fbind b
+      [make-fbind (fb-id fb-formals fb-body) fb-formals])))
+
+;;; fbind-body : fbind? -> ast?
+(define fbind-body
+  (lambda (b)
+    (cases fbind b
+      [make-fbind (fb-id fb-formals fb-body) fb-body])))
+#+END_SRC
+
+
+* Parser (YOU NEED TO IMPLEMENT THIS)
+You need to implement the =parse= function that converts the
+concrete syntax of the recursive lanauge into the ast
+representation.
+  
+#+NAME: parser
+#+BEGIN_SRC racket
+(define *keywords*
+  '(ifte assume function recursive))
+
+(define id?
+  (lambda (x)
+    (and
+     (symbol? x)
+     (not (memq x *keywords*)))))
+
+;;; parse :: any/c -> ast?  Raises exception exn?
+;;; Fill in the function parse here
+(define (parse exp)
+  ;; complete the definition
+  #f)
+
+#+END_SRC
+    
+
+** Test
+
+#+NAME: test-parsing
+#+BEGIN_SRC racket
+(define test-f1
+  (test-case "f1"
+    (check-equal? (parse '(recursive ([f1 (x) (< 5 x)])(ifte (f1 2) 0 10)))
+                  (recursive (list 
+                                (make-fbind 'f1
+                                            '(x)
+                                            (app (id-ref '<) (list (num 5) (id-ref 'x)))))
+                              (ifte (app (id-ref 'f1) (list (num 2)))
+                                    (num 0) 
+                                    (num 10))))))
+
+(define test-no-params
+  (test-case "no params to recur func"
+    (check-equal? (parse '(recursive ([v () 3]) v))
+                  (recursive (list (make-fbind 'v '() (num 3))) (id-ref 'v)))))
+
+
+(define test-multi-binds
+  (test-case "multiple binds"
+    (check-equal? (parse '(recursive ([f (x) (+ x x)] [g (y) (- (f y) 1)]) (g 1)))
+                  (recursive (list (make-fbind 'f '(x) (app (id-ref '+) (list (id-ref 'x) (id-ref 'x))))
+                                   (make-fbind 'g '(y) (app (id-ref '-) 
+                                                            (list (app (id-ref 'f) (list (id-ref 'y)))
+                                                                  (num 1)))))
+                             (app (id-ref 'g) (list (num 1)))))))
+
+
+(define test-recursive-parsing
+  (test-suite "Recursive Parsing"
+    test-f1
+    test-no-params
+    test-multi-binds))
+#+END_SRC
+
+* Recursive Environment (YOU NEED TO IMPLEMENT THIS)
+
+Evaluating expressions requires an evaluation context that keeps
+track of the variable bindings.  This evaluation context is known as
+an environment.
+
+An env is a union type of either:
+
+*empty-env* : An environment that does not have any
+variable bindings.
+
+OR
+
+*extended-env* : An extended environment consisting of a list of
+symbols, a list of denotable values and an outer environment.
+
+OR
+
+*extended-rec-env* : The extended-rec-env variant is used to define
+the recursive function bindings created using the =recursive=
+construct.
+
+#+NAME: env
+#+BEGIN_SRC racket
+(define-datatype env env?
+  [empty-env]
+  [extended-env
+    (syms (list-of symbol?))
+    (vals (list-of denotable-value?))
+    (outer-env env?)]
+  [extended-rec-env
+    (fsyms (list-of symbol?))
+    (lformals (list-of (list-of symbol?)))
+    (bodies (list-of ast?))
+    (outer-env env?)])
+#+END_SRC
+
+** Predicates
+
+#+NAME: env-predicates
+#+BEGIN_SRC racket
+;;; empty-env? : env? -> boolean?
+(define empty-env?
+  (lambda (e)
+    (cases env e
+      [empty-env () #t]
+      [else #f])))
+
+;;; extended-env? : env? -> boolean?
+(define extended-env?
+  (lambda (e)
+    (cases env e
+      [extended-env (syms vals outer-env) #t]
+      [else #f])))
+
+;;; extended-rec-env? : env? -> boolean?
+(define extended-rec-env?
+  (lambda (e)
+    (cases env e
+      [extended-rec-env (fsyms lformals bodies outer-env) #t]
+      [else #f])))
+#+END_SRC
+
+
+** Lookup (YOU NEED TO IMPLEMENT THIS)
+The function =(lookup-env e x)= is used to get the value of the
+binding =x= in the environment =e=.
+
+#+NAME: lookup-env
+#+BEGIN_SRC racket
+(define lookup-env
+  (lambda (e x) 
+    #f))
+#+END_SRC
+
+#+NAME: init-env
+#+BEGIN_SRC racket
+(define *init-env*
+  (extended-env
+   '(+ - * / < <= eq? 0? !)
+   (list +p -p *p /p <p <=p eq?p 0?p !p)
+   (empty-env)))
+#+END_SRC
+  
+#+NAME: prim-proc
+#+BEGIN_SRC racket
+;;; implement all procedures in the list
+(define +p ...)
+#+END_SRC
+
+*** Test
+
+#+NAME: lookup-test
+#+BEGIN_SRC racket
+
+(define e1
+  (extended-env '(x y z) '(1 2 3) (empty-env)))
+
+(define e2
+  (extended-env '(w x) '(5 6) e1))
+
+(define even-body
+  (ifte
+    (app (id-ref '0?) (list (id-ref 'n)))
+    (bool #t)
+    (app
+      (id-ref 'odd?)
+      (list (app
+              (id-ref '-)
+              (list (id-ref 'n) (num 1)))))))
+
+(define odd-body
+  (ifte (app (id-ref '0?) (list (id-ref 'n)))
+    (bool #f)
+    (app (id-ref 'even?)
+      (list (app (id-ref '-) (list (id-ref 'n) (num 1)))))))
+
+(define e3
+  (extended-rec-env
+    '(even? odd?)
+    '((n) (n))
+    (list even-body odd-body)
+    e2))
+
+
+
+(check-equal?
+ (closure '(n) even-body e3)
+ (lookup-env e3 'even?) "lookup-env-even? test")
+
+
+(define test-env
+  (test-case "outer env"
+    (check-equal? 6 (lookup-env e3 'x))))
+
+(define test-rec-env
+  (test-case "Outer Rec Env"
+    (check-equal?
+      (closure '(n) even-body e3)
+      (lookup-env e3 'even?))))
+
+
+(define lookup-test
+  (test-suite "Lookup"
+    test-env
+    test-rec-env))
+#+END_SRC
+
+* Semantic Domain
+
+The expressible and denotable values now include procedures along
+with numbers and booleans.  A =Procedure= is the ast representation
+of a function.
+
+** Procedure
+  
+A procedure is either a =prim-proc= or a =closure=.  A =prim-proc=
+refers to an inbuilt scheme procedure.  A closure is used for a
+user-defined function.
+   
+#+NAME: proc
+#+BEGIN_SRC racket
+(define-datatype proc proc?
+  [prim-proc
+    ;; prim refers to a scheme procedure
+    (prim procedure?)
+    ;; sig is the signature
+    (sig (list-of procedure?))] 
+  [closure
+    (formals (list-of symbol?))
+    (body ast?)
+    (env env?)])
+
+;;; prim? : proc? -> boolean?
+(define prim-proc?
+  (lambda (p)
+    (cases proc p
+      [prim-proc (prim sig) #t]
+      [else #f])))
+
+(define closure? 
+  (lambda (p)
+    (cases proc p
+      [prim-proc (prim sig) #f]
+      [else #t])))
+#+END_SRC
+
+*** Signature (Sig)
+The signature of a =prim-proc= defines the type of its return
+value and the type of each of its parameters.
+
+It is a list of predicates in which the first element denotes the
+return type and the rest of the list denotes the types of each of
+the arguments.
+
+For example, the signature of =<= (less than) would be =(list
+boolean? number? number?)=.
+
+*** Closure
+
+A closure provides the execution context (environment) required to
+evaluate the function.  A closure consists of the three things:
+formals, body and env.
+
+- Formals is the list of symbols that denote the formal parameters of
+the function.
+
+- Body is the expression that is evaluated to given the result of
+function evaluation.
+
+- Env is the environment (context) in which the boby is evaluated.
+   
+During the evalution (application) of a function, the environment
+contains bindings for all the formal parameters.
+         
+** Expressible Values
+
+Types of values returned by evaluating an ast.
+
+#+BEGIN_SRC bnf
+<expressible-value> ::= <number> | <boolean> | <proc>
+#+END_SRC
+
+#+NAME: expressible-value
+#+BEGIN_SRC racket
+;;; expressible-value? : any/c -> boolean?
+(define expressible-value?
+  (or/c number? boolean? proc?))
+#+END_SRC
+
+** Denotable Values
+
+Types of values denoted by identifiers.
+
+#+BEGIN_SRC bnf
+<denotable-value> ::= <number> | <boolean> | <proc>
+#+END_SRC
+
+#+NAME: denotable-value
+#+BEGIN_SRC racket
+;;; denotable-value? :any/c -> boolean?
+(define denotable-value?
+  (or/c number? boolean? proc?))
+#+END_SRC
+
+
+* Interpreter (YOU NEED TO IMPLEMENT THIS)
+The =eval-ast= function takes an =ast= and the corresponding =env=
+(that contains bindings for evaluation of the =ast=) and returns the
+evaluated expressible value.
+  
+#+NAME: eval-ast
+#+BEGIN_SRC racket
+(define eval-ast
+  (lambda (a e)
+    ;; your solution here
+    #f))
+
+#+END_SRC
+
+** Test
+
+#+NAME: test-eval-ast
+#+BEGIN_SRC racket
+(define test-even-odd
+ (test-case "Even Odd"
+  (check-equal?
+   (eval-ast
+    (recursive
+     (list
+      (make-fbind 'even?
+                  '(n)
+                  (ifte (app (id-ref '0?) (list (id-ref 'n)))
+                        (bool #t)
+                        (app (id-ref 'odd?)
+                             (list (app (id-ref '-) (list (id-ref 'n) (num 1)))))))
+      
+      (make-fbind 'odd?
+                  '(n)
+                  (ifte (app (id-ref '0?) (list (id-ref 'n)))
+                        (bool #f)
+                        (app (id-ref 'even?)
+                             (list (app (id-ref '-) (list (id-ref 'n) (num 1))))))))
+     
+     (app (id-ref 'even?) (list (num 3))))
+     *init-env*)
+   #f)))
+
+
+(define test-factorial
+ (test-case "factorial"
+  (check-equal?
+   (eval-ast (parse '(recursive ([f (n) (ifte (0? n) 1 (* n (f (- n 1))))])
+         (f 3))) *init-env*)
+   6)))
+
+
+(define test-recursive-evaluation
+  (test-suite "test-eval"
+   test-even-odd
+   test-factorial))
+#+END_SRC
+
+* Tangle
+
+#+BEGIN_SRC racket :noweb yes :tangle ./main.rkt
+#lang racket
+
+(require eopl)
+
+<<ast>>
+<<fbind>>
+<<parser>>
+<<env>>
+<<proc>>
+<<expressible-value>>
+<<denotable-value>>
+<<env-predicates>>
+<<lookup-env>>
+<<prim-proc>>
+<<eval-ast>>
+<<init-env>>
+
+
+(provide (all-defined-out))
+#+END_SRC
+
+#+BEGIN_SRC racket :noweb yes :tangle ./test.rkt
+#lang racket
+
+(require eopl)
+(require rackunit)
+(require racket/match)
+(require rackunit/text-ui)
+(require "main.rkt")
+
+
+
+<<test-parsing>>
+<<lookup-test>>
+<<test-eval-ast>>
+
+
+(define test-recursive
+  (test-suite "Recursive Tests"
+              test-recursive-parsing
+              lookup-test
+              test-recursive-evaluation))
+
+
+(define run-all-tests 
+  (lambda ()
+    (run-tests test-recursive)))
+
+
+(module+ test
+  (run-all-tests))
+#+END_SRC

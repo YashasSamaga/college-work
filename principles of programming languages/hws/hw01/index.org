@@ -1,0 +1,643 @@
+#+NAME: Homework Assignment 01 : Functional Programming
+
+* Introduction
+  Solving any problem using functional programming requires
+  identifying repeating patterns in the data structures and
+  leaveraging the repeating patterns to compose the solution.
+  Reccursion is a powerful tool that allows you to design the
+  solutions in this manner.
+
+  In this assignment you are required to solve the given problems on
+  list and tree data structures using reccursion and composing the
+  solution using smaller helper functions.
+
+* Additional Instructions
+  - In this assignment you are not allowed to use any of the list
+    iteration constructs defined [[https://docs.racket-lang.org/reference/pairs.html?q%3Dlist#%2528part._.List_.Iteration%2529][here]].
+  
+* Reccursion on Lists
+  
+  A list is created in racket as follows:
+  
+#+BEGIN_SRC scheme
+
+;;; empty list
+'()
+
+;;; list of symbols
+'( a 3 e % $)
+
+;;; A list of numbers
+(list 10 20 60 100 3)
+ 
+#+END_SRC
+
+  A list can be built incrementally using the =cons= function.
+
+#+NAME: cons-example
+#+BEGIN_SRC scheme
+(cons 2 '()) ;'(2)
+(cons 5 (cons 2 '())) ;'(5 2)
+#+END_SRC
+
+  A list can be deconstructed into the first item and remaining list
+  using the =car= and =cdr= functions.
+
+#+BEGIN_SRC scheme
+(car (list 20 40 1 4)) ; 20
+(cdr (list 20 40 1 4)) ; '(40 1 4)
+#+END_SRC
+
+  
+** Problem No. 1.1: Repeat
+   Write a function =(repeat n x)= that returns a list containing =n=
+   copies of =x=.
+
+*** Sample Tests
+
+#+NAME: test-repeat
+#+BEGIN_SRC scheme
+  (define repeat-fn-tests
+    (test-suite "Repeat"
+                (test-case "Repeat a number" (check-equal? (repeat 3 5) '(5 5 5)))
+                (test-case "Repeat a string" (check-equal? (repeat 3 'hi) '(hi hi hi)))
+                (test-case "Repeat a list" (check-equal? (repeat 2 '(ab ab)) '((ab ab) (ab ab))))
+                (test-case "Repeat zero times" (check-equal? (repeat 0 4) '()))))
+#+END_SRC
+
+** Problem No. 1.2: Invert
+   You need to implement a function =(invert lst)=, where =lst= is a
+   list of 2-lists (lists of length two). This function should return
+   a list with each 2-list reversed.
+
+*** Sample Tests
+
+#+NAME: test-invert
+#+BEGIN_SRC scheme
+  (define invert-fn-tests
+    (test-suite "invert-tests"
+              (test-case "2-list is (number number)"
+                         (check-equal?
+                          (invert '((1 100) (2 300) (5 600) (8 200)))
+                          '((100 1) (300 2) (600 5) (200 8))))
+              (test-case "2-list is (any any)"
+                         (check-equal?
+                          (invert '((1 400) (a b) (xy 50) ((l m) 9)))
+                          '((400 1) (b a) (50 xy) (9 (l m)))))
+              (test-case "Found a non-2-list item"
+                         (check-exn exn:fail?
+                                    (lambda () (invert '(1 (2 3))))))
+              (test-case "Not a List"
+                         (check-exn exn:fail?
+                                    (lambda () (invert 2))))))
+#+END_SRC
+
+** Problem No. 1.3: Count Occurrences
+   The function =(count-occurrences s slist)= returns the number of
+   occurrences of =s= in =slist=.  Implement the function
+   =count-occurrences=.
+
+*** Sample Tests
+
+#+NAME: test-count-occur
+#+BEGIN_SRC scheme
+    (define count-occur-fn-tests
+      (test-suite "Count Occurrences"
+                  (test-case "Single Occurrence"
+                             (check-equal? (count-occurrences 3 '(2 3 4 3 5 6 3)) 3))
+                  (test-case "Multiple Occurrences"
+                             (check-equal? (count-occurrences 2 '(2 3 4 3 5 6 3)) 1))
+                  (test-case "No Occurrence"
+                             (check-equal? (count-occurrences 9 '(2 3 4 3 5 6 3)) 0))))
+#+END_SRC
+
+
+** Problem No. 1.4: Product
+
+   Write a function =(product sos1 sos2)=, where =sos1= and =sos2= are
+   each a list of symbols without repetitions. The function should
+   return a list of =2-lists= that represents the Cartesian product of
+   sos1 and sos2. The =2-lists= may appear in any order.  If any of
+   the given lists is empty, return the other non-empty list.  If both
+   the lists are empty, return the empty list.
+
+*** Sample Tests
+
+#+NAME: test-product
+#+BEGIN_SRC scheme
+  (define test-fn-product
+    (test-suite "Product"
+                (test-case "Single Item"
+                           (check-equal? (product '(a) '(b))
+                                         '((a b))))
+                (test-case "Multiple Items"
+                           (check-equal? (product '(a b c) '(e d))
+                                         '((a e) (a d) (b e) (b d) (c e) (c d))))
+                (test-case "Any one null"
+                           (check-equal? (product '() '(e d))
+                                         '(e d)))
+                ))
+#+END_SRC
+
+** Problem No. 1.5: Every
+
+   A predicate is a function that checks for a certain property on the
+   given aguments(s).  It returns true if the property is valid, and
+   false otherwise.
+
+   You need to implement the function =(every? pred lst)= that returns
+   =#f= if any element of lst fails to satisfy pred, and returns =#t=
+   otherwise.
+
+*** Sample Tests
+
+#+NAME: test-every
+#+BEGIN_SRC scheme
+  (define test-fn-every
+    (test-suite "Every"
+                (test-case "All Pass"
+                           (check-equal? (every symbol? '(a b d g))
+                                         #t))
+                (test-case "One Fail"
+                           (check-equal? (every integer? (list 3 5 7 'd))
+                                         #f))
+                ))
+#+END_SRC
+   
+   
+** Problem No. 1.6: Merge
+
+   Implement the function =(merge loi1 loi2)=, where loi1 and loi2 are
+   lists of integers that are sorted in ascending order. This function
+   should return a sorted list of all the integers in loi1 and loi2.
+
+*** Sample Tests
+
+#+NAME: test-merge
+#+BEGIN_SRC scheme
+  (define test-fn-merge
+    (test-suite "Merge"
+                (test-case "Both lists length > 1"
+                           (check-equal? (merge (list 10 50 60 100) (list 1 3 6 9))
+                                         (list 1 3 6 9 10 50 60 100)))
+                (test-case "One list with single item"
+                           (check-equal? (merge (list 55) (list 40 60 70 120))
+                                         (list 40 55 60 70 120)))
+                ))
+#+END_SRC
+
+** Flatten
+   Given a deep-list (nested list) of symbols, implement a function
+   =(flatten dlst)= that returns a flat list of all the symbols in
+   =dlst=.
+
+*** Sample Tests
+
+#+NAME: test-flatten
+#+BEGIN_SRC scheme
+  (define test-fn-flatten
+    (test-suite "Flatten"
+                (test-case "Already Flat"
+                           (check-equal? (flatten '(a b e 4 6 r 9 s))
+                                         '(a b e 4 6 r 9 s)))
+                (test-case "Nested"
+                           (check-equal? (flatten '(g (3 (5) (f) (d e)) (9) 1))
+                                         '(g 3 5 f d e 9 1)))
+                ))
+#+END_SRC
+
+* Reccursion on Trees
+
+  A Tree is a hierarchical data structure consisting of a root node
+  and a set of sub-trees associated with it.  There are several types
+  of trees (binary tree, multi-way tree, red-black tree etc.) that are
+  defined based on certain properties.  In this assignment we are
+  going to work with binary trees.
+
+  
+** Terminology
+
+*** Node
+    A Node is the basic unit of a tree.  It has a value and it may have
+    a set of sub-trees associated with it.
+    
+*** Internal Node
+    An internal node has a non-empty set of sub-trees.
+
+*** Leaf Node
+    A Leaf node only has a value.  It does not have any sub-trees.
+
+*** Root Node
+    A root node is considered the first node of the tree.  There is
+    only one root node in a tree.
+
+*** Parent Node
+    Assume : 
+    - T is a Tree with root node A.
+    - T' is a sub-tree of T with root node B.
+    
+    A is called the Parent node of B.
+
+*** Child Node
+    The root node of each sub-tree associated with a tree node is a
+    child of that node.
+
+
+** Full Binary Tree
+   A Binary Tree is a Tree in which each node can have a maximum of
+   two children associated with it.  A full binary tree can only have
+   either 0 or 2 children.
+   
+   As a common convention the first child is called the left child and
+   the second one is called the right child.
+   
+   For simplicity, in this assignment we will only allow integer
+   values in nodes.
+
+   You need to use the given data-type definition for
+   full-binary-tree.
+
+#+NAME: full-binary-tree
+#+BEGIN_SRC scheme :tangle ./datatypes.rkt
+  #lang racket/base
+
+  (require eopl)
+
+  (define-datatype full-binary-tree full-binary-tree?
+    (internal-node (value integer?)
+                   (left-child full-binary-tree?)
+                   (right-child full-binary-tree?))
+    (leaf-node (value integer?)))
+
+
+  (define inode
+    (lambda (v l r)(internal-node v l r)))
+
+  (define lnode
+    (lambda (v)(leaf-node v)))
+
+
+  (provide full-binary-tree)
+  (provide full-binary-tree?)
+  (provide inode)
+  (provide lnode)
+
+  (provide internal-node)
+  (provide leaf-node)
+#+END_SRC
+
+*** Sample Tree Instances
+    These tree instances are used in the sample tests.
+
+#+NAME: sample-trees
+#+BEGIN_SRC scheme
+  (define singleton-tree (lnode 10))
+
+  (define small-tree
+    (inode 20
+           (lnode 30)
+           (lnode 40)))
+
+  (define larger-tree
+    (inode 100
+           (inode 50
+                  (inode 200
+                         (lnode 5)
+                         (lnode 6))
+                  (lnode 80))
+           (lnode 40)))
+#+END_SRC
+   
+** Traversal
+   Traversing a tree requires visiting each node in the tree in a
+   specific order.  You need to implement traversal functions for
+   each of the orders defined below:
+
+*** Problem No. 2.1 : Preorder Traversal
+    The function =(traverse/preorder tree)= takes a full binary tree
+    as a parameter and returns a list containing values of each node
+    in =tree= following =preorder= traversal.
+
+**** Sample Tests
+
+#+NAME: test-preorder
+#+BEGIN_SRC scheme
+  (define test-preorder 
+    (test-suite "Preorder"
+                (test-case "singleton"
+                           (check-equal? (traverse/preorder singleton-tree)
+                                         (list 10)))
+                (test-case "small"
+                           (check-equal? (traverse/preorder small-tree)
+                                         (list 20 30 40)))
+                (test-case "larger"
+                           (check-equal? (traverse/preorder larger-tree)
+                                         (list 100 50 200 5 6 80 40)))))
+#+END_SRC
+*** Problem No. 2.2 : Inorder
+    The function =(traverse/inorder tree)= takes a full binary tree
+    as a parameter and returns a list containing values of each node
+    in =tree= following =inorder= traversal.
+**** Sample Tests
+
+#+NAME: test-inorder
+#+BEGIN_SRC scheme
+  (define test-inorder
+    (test-suite "Inorder"
+                (test-case "singleton"
+                           (check-equal? (traverse/inorder singleton-tree)
+                                         (list 10)))
+                (test-case "small"
+                           (check-equal? (traverse/inorder small-tree)
+                                         (list 30 20 40)))
+                (test-case "larger"
+                           (check-equal? (traverse/inorder larger-tree)
+                                         (list 5 200 6 50 80 100 40)))))
+#+END_SRC
+
+*** Problem No. 2.3 : Postorder
+    The function =(traverse/postorder tree)= takes a full binary tree
+    as a parameter and returns a list containing values of each node
+    in =tree= following =postorder= traversal.
+
+**** Sample Tests
+    
+#+NAME: test-postorder
+#+BEGIN_SRC scheme
+  (define test-postorder
+    (test-suite "Postorder"
+                (test-case "singleton"
+                           (check-equal? (traverse/postorder singleton-tree)
+                                         (list 10)))
+                (test-case "small"
+                           (check-equal? (traverse/postorder small-tree)
+                                         (list 30 40 20)))
+                (test-case "larger"
+                           (check-equal? (traverse/postorder larger-tree)
+                                         (list 5 6 200 80 50 40 100)))))
+#+END_SRC
+
+
+** Count Nodes
+   
+*** Problem No. 2.4 : Count All Nodes
+    The function =(count-nodes tree)= should return the number of nodes
+    in the =tree=.
+    
+**** Sample Tests
+    
+#+NAME: test-count-nodes
+#+BEGIN_SRC scheme
+  (define test-count-nodes
+    (test-suite "Count Nodes"
+                (test-case "singleton"
+                           (check-equal? (count-nodes singleton-tree)
+                                         1))
+                (test-case "small"
+                           (check-equal? (count-nodes small-tree)
+                                         3))
+                (test-case "larger"
+                           (check-equal? (count-nodes larger-tree)
+                                         7))))
+#+END_SRC
+
+*** Problem No. 2.5 : Count Leaf Nodes
+    The function =(count-leaves tree)= should return the number of
+    leaf nodes in the given =tree=.
+**** Sample Tests
+    
+#+NAME: test-count-leaves
+#+BEGIN_SRC scheme
+  (define test-count-leaves
+    (test-suite "Count Leaves"
+                (test-case "singleton"
+                           (check-equal? (count-leaves singleton-tree)
+                                         1))
+                (test-case "small"
+                           (check-equal? (count-leaves small-tree)
+                                         2))
+                (test-case "larger"
+                           (check-equal? (count-leaves larger-tree)
+                                         4))))
+#+END_SRC
+    
+*** Problem No. 2.6 : Count Internal Nodes
+    The function =(count-internal tree)= should return the number of
+    leaf nodes in the given =tree=.
+**** Sample Tests
+    
+#+NAME: test-count-internal
+#+BEGIN_SRC scheme
+  (define test-count-internal
+    (test-suite "Count Internal"
+                (test-case "singleton"
+                           (check-equal? (count-internal singleton-tree)
+                                         0))
+                (test-case "small"
+                           (check-equal? (count-internal small-tree)
+                                         1))
+                (test-case "larger"
+                           (check-equal? (count-internal larger-tree)
+                                         3))))
+#+END_SRC
+
+
+** Problem No. 2.7 : Map
+   The function =(tree/map fn tr)= returns a tree that results from
+   applying the function =fn= to the *value* of each node in the tree.
+   
+   This function is similar to the map function for lists.  It should
+   not change the structure of the tree.
+
+**** Sample Tests
+    
+#+NAME: test-tree-map
+#+BEGIN_SRC scheme
+    (define test-tree-map
+      (test-suite "Tree Map"
+                  (test-case "singleton"
+                             (check-equal? (tree/map 
+                                            add1 singleton-tree
+                                            )
+                                           (lnode 11)))
+                  (test-case "small"
+                             (check-equal? (tree/map 
+                                            add1 small-tree
+                                            )
+                                           (inode 21
+                                                          (lnode 31)
+                                                          (lnode 41))))
+                  ))
+#+END_SRC
+
+
+** Path
+   Path is a list of directions or steps that that locate any node in
+   a tree.  In a binary tree, there are only two directions (left and
+   right).  So a sequence such as =("left" "right" "left")= can
+   identify any node in a binary tree.  Every node in a tree has a
+   unique path and can be used to perform operations on a specific
+   node in a tree.
+
+   Path items are defined below:
+
+#+NAME: path-items
+#+BEGIN_SRC scheme
+(define path-item (list "left" "right"))
+#+END_SRC
+
+   Any list containing path-item values is considered as a path.
+
+#+BEGIN_SRC scheme
+(list "left" "right" "left" "left")
+(list "left" "right" "right")
+(list "right")
+'() ;empty path
+#+END_SRC
+
+   All paths are by default considered relative to the current path.
+   Therefore, the empty path represent the fact that the current node
+   is the target of the path (required node).
+
+*** Problem No. 2.8 : Value at Path
+    The function =(value-at-path path tree)= should return the value
+    of the node at given =path= (if it exists) in the =tree=.
+
+**** Sample Tests
+    
+#+NAME: test-vap
+#+BEGIN_SRC scheme
+      (define test-value-at-path
+        (test-suite "Value at Path"
+                    (test-case "left-right"
+                               (check-equal? (value-at-path 
+                                              (list "left" "right")
+                                              larger-tree)
+                                             80))
+                    (test-case "root"
+                               (check-equal? (value-at-path 
+                                              '()
+                                              larger-tree)
+                                             100))
+                    ))
+#+END_SRC
+
+*** Problem No. 2.9 : Search
+    Given a full binary tree, the function =(search val tree)= should
+    return the =path= to the first occurrence (as it would occur in
+    the pre-order traversal) of any node with value =val= (which we
+    have defined to be an integer for our tree data-type).
+
+**** Sample Tests
+    
+#+NAME: test-search
+#+BEGIN_SRC scheme
+      (define test-search
+        (test-suite "Search"
+                    (test-case "found"
+                               (check-equal? (search 
+                                              200
+                                              larger-tree)
+                                             (list "left" "left")))
+                    ))
+#+END_SRC
+
+*** Problem No. 2.10 : Update
+    The =(update path fn tree)= function returns a tree that results
+    from replacing the value of the node at given =path= in =tree= by applying the
+    =fn= function to the node value at =path=.
+
+**** Sample Tests
+    
+#+NAME: test-update
+#+BEGIN_SRC scheme
+      (define test-update
+        (test-suite "Update"
+                    (test-case "update"
+                               (check-equal? (update
+                                              (list "left")
+                                              add1
+                                              singleton-tree)
+                                             (lnode 10)))
+                    ))
+#+END_SRC
+
+*** Problem No. 2.11 : Insert
+    =(tree/insert path left-st right-st tree)= Given a path insert the
+    given =left-st= and =right-st= nodes at a leaf node with the
+    =path=.
+**** Sample Tests
+     
+#+NAME: test-insert
+#+BEGIN_SRC scheme
+      (define test-insert
+        (test-suite "Insert"
+                    (test-case "insert"
+                               (check-equal? (tree/insert
+                                              '()
+                                              (lnode 3)
+                                              (lnode 5)
+                                              singleton-tree)
+                                             (inode 10
+                                                  (lnode 3)
+                                                  (lnode 5))))
+                    ))
+#+END_SRC
+
+* Tangle
+  
+#+BEGIN_SRC scheme :noweb yes :tangle ./test.rkt
+#lang racket
+
+(require eopl)
+
+(require rackunit)
+(require rackunit/text-ui)
+(require "datatypes.rkt")
+(require "main.rkt")
+
+<<test-repeat>>
+<<test-invert>>
+<<test-count-occur>>
+<<test-product>>
+<<test-every>>
+<<test-merge>>
+<<test-flatten>>
+
+
+<<sample-trees>>
+
+<<test-preorder>>
+<<test-inorder>>
+<<test-postorder>>
+<<test-count-nodes>>
+<<test-count-leaves>>
+<<test-count-internal>>
+<<test-tree-map>>
+<<path-items>>
+<<test-vap>>
+<<test-search>>
+<<test-update>>
+<<test-insert>>
+
+
+(run-tests repeat-fn-tests)
+(run-tests invert-fn-tests)
+(run-tests count-occur-fn-tests)
+(run-tests test-fn-product)
+(run-tests test-fn-every)
+(run-tests test-fn-merge)
+(run-tests test-fn-flatten)
+(run-tests test-preorder)
+(run-tests test-inorder)
+(run-tests test-postorder)
+(run-tests test-count-nodes)
+(run-tests test-count-leaves)
+(run-tests test-count-internal)
+(run-tests test-tree-map)
+
+(run-tests test-value-at-path)
+(run-tests test-search)
+(run-tests test-update)
+(run-tests test-insert)
+#+END_SRC

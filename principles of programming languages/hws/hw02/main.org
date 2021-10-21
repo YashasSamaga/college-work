@@ -1,0 +1,592 @@
+#+NAME: Homework Assignment 02 : Solution
+
+* Introduction
+
+  This is the solution to homework assigment 2.
+
+* Recursion on Lists
+
+** Problem No. 1.1: Repeat
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    The basic idea is ~x :: repeat (n - 1) x~. We keep adding an element until the ~n~ argument becomes zero.
+
+**** Step 2: handle base cases
+    - ~n~ is zero: return ~[]~
+
+**** Final code
+    Pre-conditions:
+    - ~n~ must be non-negative
+
+#+NAME: repeat
+#+BEGIN_SRC elm
+repeat : Int -> a -> List a
+repeat n x =
+    if n == 0 then
+        []
+    else
+      x :: repeat (n - 1) x
+#+END_SRC
+
+** Problem No. 1.2: Invert
+
+  We can break the problem into two subproblems: reverse and map. We execute reverse on each element of the list using map.
+
+*** Solution
+
+**** Step 1: reverse
+
+Reverse is almost identical to copying a list. We just append the remaining reversed list first and then the current item. We continue recursing until we arrive at an empty list whose reverse is the empty list itself.
+
+#+NAME: repeat-s1-reverse
+#+BEGIN_SRC elm
+reverse lst = 
+    case lst of
+        [] -> []
+        x :: xs -> (reverse xs) ++ [x]
+#+END_SRC
+
+**** Step 2: map
+
+We construct the modified list one by one. At each recursion step, we compute the transformed value and ~(f x) :: (map f xs)~.
+
+#+NAME: repeat-s2-map
+#+BEGIN_SRC elm
+map f lst =
+    case lst of
+        [] -> []
+        x :: xs -> (f x) :: (map f xs)
+#+END_SRC
+
+**** Final code
+
+#+NAME: invert
+#+BEGIN_SRC elm
+invert : List (List a) -> List (List a)
+invert twolst =
+    let
+        reverse lst = 
+            case lst of
+                [] -> []
+                x :: xs -> (reverse xs) ++ [x]
+        map f lst =
+            case lst of
+                [] -> []
+                x :: xs -> (f x) :: (map f xs)
+    in
+    map reverse twolst
+#+END_SRC
+
+** Problem No. 1.3: Count Occurences
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is:
+
+#+BEGIN_SRC
+    if x == lst[0]:
+       1 + (count-occurrences x lst[1:]) ;; zero based indexing; henceforth, assume in all questions unless explicitly specified in pseudocode
+    else
+       count-occurrences x lst[1:]
+#+END_SRC
+
+**** Step 2: handle base cases
+    - ~lst~ is empty; return zero.
+
+**** Final code
+
+#+NAME: count_occurrences
+#+BEGIN_SRC elm
+count_occurrences : a -> List a -> Int
+count_occurrences s slist =
+    case slist of
+        [] -> 0
+        x :: xs -> 
+            if x == s then
+                1 + (count_occurrences s xs)
+            else
+                (count_occurrences s xs)
+#+END_SRC
+
+** Problem No. 1.4: Product
+
+*** Solution
+
+**** Step 1: ~product1 x lst~
+    This helper function generates a 2-list consisting of ~[x, y]~ elements for every element ~y~ in ~lst~.
+
+    ~product1 5 [1 2 3] => [[5, 1] [5, 2] [5, 3]~
+
+**** Step 2: ~product2 lst1 lst2~
+    This helper function takes two non-empty lists and computes the cartesian product of the two. This is achieved by appending results of ~product1 x lst2~ for each element ~x~ of ~lst1~.
+
+**** Step 3: edge cases
+    - return empty list if any of the lists is empty
+
+**** Final code
+
+#+NAME: product
+#+BEGIN_SRC elm
+product : List a -> List a -> List (List a)
+product lstA lstB =
+    let
+        product1 val lst =
+            case lst of
+                [] -> []
+                x :: xs -> [val, x] :: (product1 val xs) 
+        product2 lst1 lst2 =
+            case lst1 of
+                [] -> []
+                x :: xs -> (product1 x lst2) ++ (product2 xs lst2)
+    in
+    case (lstA, lstB) of
+        ([], _) -> []
+        (_, []) -> []
+        (itemsA, itemsB) -> product2 itemsA itemsB 
+#+END_SRC
+
+** Problem No. 1.5: Every
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is ~(pred x) && (every pred xs)~. We keep checking one element each iteration.
+
+**** Step 2: handle base cases
+    - ~lst~ is empty, return ~True~
+
+**** Final code
+
+#+NAME: every
+#+BEGIN_SRC elm
+every : (a -> Bool) -> List a -> Bool
+every pred lst =
+    case lst of
+        [] -> True
+        x :: xs -> (pred x) && (every pred xs)
+#+END_SRC
+
+** Problem No. 1.6: Merge
+
+*** Solution
+
+**** Step 1: identify recursion
+    The basic idea is:
+
+#+BEGIN_SRC elm
+    if lst1[0] < lst2[1]:
+        lst1[0] :: merge lst1[1:] lst2
+    else:
+        lst2[0] :: merge lst2[1:] lst1
+#+END_SRC
+
+**** Step 2: handle base cases
+    - ~lst1~ is empty, return ~lst2~
+    - ~lst2~ is empty, return ~lst1~
+    - ~lst1~ and ~lst2~ are empty, return null list
+
+**** Final code
+    Pre-conditions:
+    - ~lst1~ must be a list sorted in ascending order
+    - ~lst2~ must be a list sorted in ascending order
+
+#+NAME: merge
+#+BEGIN_SRC elm
+merge : List Int -> List Int -> List Int
+merge lst1 lst2 =
+    case (lst1, lst2) of
+        ([], []) -> []
+        ([], items) -> items
+        (items, []) -> items
+        (x :: xs, y :: ys) ->
+            if x <= y then
+                x :: merge xs lst2
+            else
+                y :: merge lst1 ys
+#+END_SRC
+
+* Reccursion on Trees
+
+** Problem No. 2.1 : Preorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: current, left, right
+
+#+BEGIN_SRC
+    if current_node is internal:
+        v :: (traverse/preorder l) ++ (traverse/preorder r)
+    else:
+        [v]
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: preorder
+#+BEGIN_SRC elm
+preorder : Tree -> List Int
+preorder tree =
+    case tree of
+        Node v left right -> [v] ++ (preorder left) ++ (preorder right)
+        Leaf v -> [v]
+#+END_SRC
+
+
+** Problem No. 2.2 : Inorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: left, current, right
+
+#+BEGIN_SRC
+    if current_node is internal:
+        (inorder l) ++ [v] ++ (inorder r)
+    else:
+        [v]
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: inorder
+#+BEGIN_SRC elm
+inorder : Tree -> List Int
+inorder tree =
+    case tree of
+        Node v left right -> (inorder left) ++ [v] ++ (inorder right)
+        Leaf v -> [v]
+#+END_SRC
+
+** Problem No. 2.3 : Postorder Traversal
+
+*** Solution
+
+**** Step 1: identify recursion logic
+    Order: left, right, current
+
+#+BEGIN_SRC
+    if current_node is internal:
+        (inorder l) ++ (inorder r) ++ [v]
+    else:
+        (list v)
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: postorder
+#+BEGIN_SRC elm
+postorder : Tree -> List Int
+postorder tree =
+    case tree of
+        Node v left right -> (postorder left) ++ (postorder right) ++ [v]
+        Leaf v -> [v]
+#+END_SRC
+
+** Problem No. 2.4 : Count All Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+
+#+BEGIN_SRC
+    if current_node is internal:
+        (count_nodes l) + 1 + (count_nodes r)
+    else:
+        1
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count_nodes
+#+BEGIN_SRC elm
+count_nodes : Tree -> Int
+count_nodes tree =
+    case tree of
+        Node v left right -> (count_nodes left) + 1 + (count_nodes right)
+        Leaf v -> 1
+#+END_SRC
+
+** Problem No. 2.5 : Count Leaf Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+
+#+BEGIN_SRC
+    if current_node is internal:
+        (count_leaves l) + (count_leaves r)
+    else:
+        1
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count_leaves
+#+BEGIN_SRC elm
+count_leaves : Tree -> Int
+count_leaves tree =
+    case tree of
+        Node v left right -> (count_leaves left) + (count_leaves right)
+        Leaf v -> 1
+#+END_SRC
+
+
+** Problem No. 2.6 : Count Internal Nodes
+
+*** Solution
+
+**** Step 1: identify recursion logic
+
+#+BEGIN_SRC
+    if current_node is internal:
+        (count_internal l) + 1 + (count_internal r)
+    else:
+        0
+#+END_SRC
+
+    There are no base cases since every node must be an internal node or a leaf node. There is no empty tree.
+
+**** Final code
+
+#+NAME: count_internal
+#+BEGIN_SRC elm
+count_internal : Tree -> Int
+count_internal tree =
+    case tree of
+        Node v left right -> (count_internal left) + 1 + (count_internal right)
+        Leaf v -> 0
+#+END_SRC
+
+
+** Problem No. 2.7 : Map
+
+*** Solution
+
+**** Step 1: identify logic
+    We essentially need to reconstruct the tree with new values for the nodes. We first write a function that will recreate the tree one node at a time. We then modify the code to use ~(f v)~ instead of ~v~ while duplicating a node.
+
+**** Final code
+
+#+NAME: tree_map
+#+BEGIN_SRC elm
+tree_map : (Int -> Int) -> Tree -> Tree
+tree_map f tree =
+    case tree of
+        Node v left right -> Node (f v) (tree_map f left) (tree_map f right)
+        Leaf v -> Leaf (f v)
+#+END_SRC
+
+
+** Problem No. 2.8 : Value at path
+
+*** Solution
+
+**** Step 1: identify recursion logic
+
+#+BEGIN_SRC
+    if path is empty:
+        node value
+    elif path[0] == Left:
+        value-at-path path[1:] left-subtree
+    elif path[0] == Right:
+        value-at-path path[1:] right-subtree
+#+END_SRC
+
+**** Step 2: handle base cases
+    - leaf node: return value if path is empty, otherwise return ~Nothing~
+
+**** Final code
+
+#+NAME: value_at_path
+#+BEGIN_SRC elm
+value_at_path : List PathItem -> Tree -> Maybe Int
+value_at_path path tree =
+    case tree of
+        Node v left right ->
+            case path of
+                [] -> Just v
+                Left :: xs -> (value_at_path xs left)
+                Right :: xs -> (value_at_path xs right)
+        Leaf v ->
+            case path of
+                [] -> Just v
+                _ -> Nothing
+#+END_SRC
+
+** Problem No. 2.9 : Search
+
+*** Solution
+
+**** Step 1: the main idea
+    We will go searching for the value and reconstruct the path as we return from the found site. We return ~Nothing~ if the path is not found.
+
+    During back tracking, we accumulate the path in a list. We return Nothing if the value was not found, otherwise, we will be returning a list that would be consturcted as we backtrace.
+
+    Preorder: current, left, right
+
+#+BEGIN_SRC
+    if current_node->value == key:
+        []
+    elif (search key left-subtree) is not Nothing:
+        Left :: (search key left-subtree)
+    elif (search key right-subtree) is not Nothing:
+        Right :: (search key right-subtree)
+    else:
+        Nothing ;; not found
+#+END_SRC
+
+**** Step 2: handle base cases
+    - leaf-node, return ~[]~ if the node's value matches the key, otherwise return Nothing
+
+**** Final code
+
+#+NAME: search
+#+BEGIN_SRC elm
+search : Int -> Tree -> Maybe (List PathItem)
+search key tree =
+    case tree of
+        Node v left right ->
+            if v == key then Just []
+            else
+                case (search key left) of
+                    Nothing ->
+                        case (search key right) of
+                            Nothing -> Nothing
+                            Just items -> Just (Right :: items)
+                    Just items -> Just (Left :: items)
+        Leaf v ->
+            if v == key then
+                Just []
+            else Nothing
+#+END_SRC
+
+
+** Problem No. 2.10 : Update
+
+*** Solution
+
+**** Step 1: the main idea
+
+#+BEGIN_SRC elm
+    if path is empty:
+        if node is internal:
+            Node (f value) left-subtree right-subtree ;; reuse the left and right subtrees
+        else:
+            Leaf (f value)
+    elif path[0] == Left:
+       ;; must be internal node
+       Node value (update path[1:] left-subtree) f right-subtree
+    elif path[0] == Right:
+       ;; must be internal node
+       Node value left-subtree (update path[1:] f right-subtree
+#+END_SRC
+
+**** Step 2: handle edge case
+    - path not empty at leaf node => return node unmodified
+
+**** Final code
+
+#+NAME: update
+#+BEGIN_SRC elm
+update : List PathItem -> (Int -> Int) -> Tree -> Tree
+update path f tree =
+    case tree of
+        Node v left right ->
+            case path of
+                [] -> Node (f v) left right
+                Left :: xs -> Node v (update xs f left) right
+                Right :: xs -> Node v left (update xs f right)
+        Leaf v ->
+            case path of
+                [] -> Leaf (f v)
+                _ -> Leaf v
+#+END_SRC
+
+** Problem No. 2.11 : Insert
+
+*** Solution
+
+**** Step 1: identify iterative logic
+    We only insert at leaf nodes. We have to reconstruct rest of the tree. We copy-paste the update code and replace the ~update~ recursive call with ~tree_insert~. Our only change is how we handle the case where the path leads to an internal node or how we handle leaf nodes.
+
+**** Step 2: handle leaf node
+    - if path is empty, create a new internal node with the given subtrees
+    - if the path is not empty, return the leaf node as it is
+
+**** Step 3: handle edge case
+    - if the path ends at an internal node, return the internal node as it is
+
+**** Final code
+
+#+NAME: tree_insert
+#+BEGIN_SRC elm
+tree_insert : List PathItem -> Tree -> Tree -> Tree -> Tree
+tree_insert path lst rst tree =
+    case tree of
+    Node v left right ->
+        case path of
+            [] -> Node v left right
+            Left :: xs -> Node v (tree_insert xs lst rst left) right
+            Right :: xs -> Node v left (tree_insert xs lst rst right)
+    Leaf v ->
+        case path of
+            [] -> Node v lst rst
+            _ -> Leaf v
+#+END_SRC
+
+* Tangle
+
+#+BEGIN_SRC elm :noweb yes :padline no :tangle ./src/Main.elm
+module Main exposing (..)
+import Defns exposing (..)
+
+<<repeat>>
+
+<<invert>>
+
+<<count_occurrences>>
+
+<<product>>
+
+<<every>>
+
+<<merge>>
+
+
+<<preorder>>
+
+<<inorder>>
+
+<<postorder>>
+
+<<count_nodes>>
+
+<<count_leaves>>
+
+<<count_internal>>
+
+<<tree_map>>
+
+<<value_at_path>>
+
+<<search>>
+
+<<update>>
+
+<<tree_insert>>
+
+#+END_SRC

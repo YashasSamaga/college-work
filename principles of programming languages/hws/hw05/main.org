@@ -1,0 +1,244 @@
+#+TITLE: Homework Assignment - 05 : Bisimulation
+
+* This assignment is about Bisimilarity of Terms
+  In this assignment you need to implement the function =bisimilar?=
+  that checks if the given terms have a bisimulation relation as
+  defined [[https://faculty.iiit.ac.in/~vxc/popl/current-topics/syntax/coterms.html#orgc7912d3][here]] in the lecture notes.
+
+  You are provided with the following constructs to help you with the
+  implementation:
+
+  - [[https://faculty.iiit.ac.in/~vxc/popl/current-topics/syntax/coterms.html#org6630813][Colist]] :: co-inductive version of list.
+  - Unroll :: to access the elements of an inductive list.
+  - Head and Tail :: =car= and =cdr= for the colist.
+  
+* Co-list
+  A colist is defined by wrapping a list in a lambda expression,
+  resulting in delayed evaluation.  As a result, in order to access
+  the items in a =colist=, we need to =unroll= the =colist=.
+
+#+name: colist
+#+BEGIN_SRC racket 
+(define-syntax colist
+  (syntax-rules ()
+    [(colist sym terms ...) 
+     (lambda () (list sym terms ...))]))
+#+END_SRC
+
+* Unroll
+  A term is either a =list= or a =colist=.  If it is a list, no
+  unrolling is needed and we return the term as it is.  If the term is
+  a colist, we return the evaluation of the function that represents
+  the term.
+
+#+name: unroll
+#+BEGIN_SRC racket
+;;; unroll :: term? -> term?
+(define (unroll t)
+  (if (procedure? t) (t) t))
+#+END_SRC
+
+* Head and Tail
+  =(hd t)= is similar to =car= for term.  It returns the first element
+  of the term.  Similarly, =(tl t)= returns the term resulting from
+  removing the first element of the list/colist representing =t=.
+  
+#+NAME: head-and-tail
+#+BEGIN_SRC racket
+;;; hd :: term? -> symbol?
+(define (hd t)
+  (car (unroll t)))
+
+;;; tl :: term? -> term?
+(define (tl t)
+  (cdr (unroll t)))
+#+END_SRC
+
+* Bisimilar? (YOU NEED TO IMPLEMENT THIS)
+  You need to implement the function =(bisimilar? t1 t2)= that returns
+  =#t= if the given terms graphs =t1= and =t2= are bisimilar, and =#f=
+  otherwise.
+
+** Solution
+
+*** Step 1: main idea
+
+Checking each term one by one for agreement will not work for coinductive terms. The logic will lead to an infinite loop. We use a atypical logic to solve this problem. We assume that the terms are bisimilar and try to disprove.
+
+We start off by trying to match the heads. If they match we wil move on to match the arguments. If the two arguments are procedures, we assume that the two procedures are equal and continue checking remaining terms. We store the assumption in a list and pass it around. If it turns out that the checking excerise returned false, we will backtrace to remove our assumption and expand. If the two arguments are not procedures, we will continue expanding normally.
+
+*** Step 2: utilities
+
+We need a function to check if something is a term.
+
+#+NAME: term-check
+#+BEGIN_SRC racket
+  (define (term? t)
+    (cond
+      [(and (list? t) (not (null? t))) #t]
+      [(and (procedure? t)) #t]
+      [else #f]
+    )
+  )
+#+END_SRC
+
+We need a function to check if the assumption is in the list of assumptions, i.e. check if an item is in the list.
+
+#+NAME: term-check
+  (define (inlst item lst)
+    (if (member item lst) #t #f)
+  )
+#+END_SRC
+
+*** Step 3: logic
+
+Let the following logic be in a local function 'loop?'. We create a wrapper for bisimilar? to pass assumptions list.
+
+- check if the given arguments are terms (if not, raise exception)
+- check if the lengths are identical (otherwise, return false)
+- if the heads are equal, proceed to check the arguments
+
+Let the arguments checking function be called 'same-args?'.
+- empty list, return true
+- if the current arguments are procedures: check if they are equal by assumption; otherwise, assume and try
+- if the assumption leads to true, return true; otherwise, try without assumption using 'loop?'
+- if the current arguments are not both procedures, expand using 'loop?'.
+
+#+NAME: bisimilar
+#+BEGIN_SRC racket
+;;; term? -> term? -> boolean?
+(define (bisimilar? t1 t2)
+  (define (term? t)
+    (cond
+      [(and (list? t) (not (null? t))) #t]
+      [(and (procedure? t)) #t]
+      [else #f]
+    )
+  )
+  (define (inlst item lst)
+    (if (member item lst) #t #f)
+  )
+  (define (loop? t1 t2 assumptions)
+    (define (same-args? lst1 lst2 assumptions)
+      (if (null? lst1)
+        #t
+        (let* ([x (hd lst1)] [y (hd lst2)] [xs (tl lst1)] [ys (tl lst2)] [tpr1 (list x y)] [tpr2 (list y x)])
+          (if (and (procedure? x) (procedure? y))
+            (cond
+              [(inlst tpr1 assumptions) (same-args? xs ys assumptions)]
+              [(inlst tpr2 assumptions) (same-args? xs ys assumptions)]
+              [else
+                (if (same-args? xs ys (cons tpr1 assumptions))
+                  #t
+                  (loop? x y assumptions)
+                )
+              ]
+            )
+            (loop? x y assumptions)
+          )          
+        )
+      )
+    )
+    (cond
+      [(not (and (term? t1) (term? t2))) (raise-type-error)]
+      [(not (equal? (length (unroll t1)) (length (unroll t2)))) #f]
+      [(equal? (hd t1) (hd t2)) (same-args? (tl t1) (tl t2) assumptions)]
+      [else #f]
+    )
+  )
+  (loop? t1 t2 (list))
+)
+#+END_SRC
+
+
+* Tests
+
+** Custome Error Check
+   If the any of the arguments are not a term, then you need to raise
+   a =exn:type-error= exception.
+
+#+NAME: type-error
+#+BEGIN_SRC racket
+(struct exn:type-error exn:fail ())
+
+(define (raise-type-error)
+  (raise (exn:type-error
+          "Invalid Arguments"
+          (current-continuation-marks))))
+#+END_SRC
+
+#+NAME: custom-error-test
+#+BEGIN_SRC racket
+(check-exn 
+  exn:type-error?
+  (lambda () (bisimilar? '() '())))
+
+(check-exn 
+  exn:type-error?
+  (lambda () (bisimilar? '1 (list 'x))))
+#+END_SRC
+
+** Regular Tests
+#+BEGIN_SRC racket :noweb yes :tangle ./test.rkt
+#lang racket
+
+(require rackunit)
+(require "main.rkt")
+
+(define (a) (list 'a))
+
+(let ([t (a)])
+  (check-true (bisimilar? t t)))
+
+(let ([t1 (colist 'a)]
+      [t2 (list 'a)])
+  (check-true (bisimilar? t1 t2)))
+
+(letrec ([t (colist 'g t)])
+  (check-true (bisimilar? t t)))
+
+(let* ([t1 (a)]
+       [t2 (a)])
+  (check-true (bisimilar? (list 'f t1 t2) (list 'f t1 t1))))
+
+(letrec ([t1 (colist 'g t2)]
+         [t2 (colist 'g t1)])
+  (check-true (bisimilar? t1 t2)))
+
+
+(letrec ([t1 (colist 'g t2)]
+         [t2 (colist 'g t2)])
+  (check-true (bisimilar? t1 t2)))
+
+(letrec ([t1 (list 'f '(a) '(b))]
+         [t2 (colist 'g t1 t2)])
+  (check-false (bisimilar? t1 t2)))
+
+(letrec ([t1 (list 'g (list 'g '(a)))]
+         [t2 (colist 'g t2)])
+  (check-false (bisimilar? t1 t2)))
+
+(check-exn 
+  exn:fail?
+  (lambda () (bisimilar? (list 'r))))
+
+<<custom-error-test>>
+#+END_SRC
+
+  
+* Tangle
+
+#+BEGIN_SRC racket :noweb yes :tangle ./main.rkt
+#lang racket
+
+<<colist>>
+<<term>>
+<<unroll>>
+<<head-and-tail>>
+<<type-error>>
+<<bisimilar>>
+
+(provide bisimilar?)
+(provide colist)
+(provide (struct-out exn:type-error))
+#+END_SRC
